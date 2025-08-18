@@ -104,6 +104,7 @@ The project uses a comprehensive design system with:
    ```bash
    npm run build
    ```
+   deploy-5
 
 2. **Deploy the `dist` folder** to your hosting platform
    - Netlify
