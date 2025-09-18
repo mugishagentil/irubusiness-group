@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IRU Business Group Ltd — Interview Application</title>
+  <meta name="description" content="Apply to give a free interview on IRU TV, Frame & Tune Studio, Epishow TV, or All About TV." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.06);
+      --card-strong: rgba(255,255,255,0.12);
+      --text: #e7ecf5;
+      --muted: #9fb0cc;
+      --brand: #7c5cff;
+      --brand-2: #22d3ee;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
+      background: radial-gradient(1200px 800px at 10% -10%, rgba(124,92,255,0.25), transparent 60%),
+                  radial-gradient(1000px 700px at 100% 10%, rgba(34,211,238,0.20), transparent 60%),
+                  var(--bg);
+    }
+    .container{max-width:1100px; margin:40px auto; padding:0 20px}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:14px;
+    }
+    .logo{
+      width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,var(--brand),var(--brand-2));
+      display:grid; place-items:center; box-shadow:var(--shadow);
+    }
+    .logo svg{filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));}
+    h1{font-size:clamp(22px,3.5vw,36px); margin:0; letter-spacing:0.2px}
+    .subtitle{color:var(--muted); margin-top:4px; font-size:14px}
+    .actions{display:flex; gap:10px}
+    .btn{
+      appearance:none; border:none; padding:10px 14px; border-radius:12px; background:var(--card);
+      color:var(--text); cursor:pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      box-shadow:var(--shadow); transition: all .2s ease; font-weight:600;
+    }
+    .btn:hover{transform:translateY(-1px); background:var(--card-strong)}
+    .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));}
+    .grid{display:grid; grid-template-columns:1.2fr .8fr; gap:20px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .card{
+      background:var(--card); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius-xl); box-shadow:var(--shadow);
+    }
+    .card .inner{padding:20px}
+
+    /* Stepper */
+    .stepper{display:flex; align-items:center; gap:10px; padding:16px}
+    .step{
+      display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.06); font-size:13px; color:var(--muted)
+    }
+    .step.active{background:linear-gradient(135deg, rgba(124,92,255,0.25), rgba(34,211,238,0.25)); color:var(--text);}
+    .step .num{width:24px; height:24px; display:grid; place-items:center; border-radius:8px; font-weight:700; background:rgba(255,255,255,0.08)}
+
+    /* Progress */
+    .progress{height:8px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; margin:0 16px 16px}
+    .progress > div{height:100%; width:0%; background:linear-gradient(90deg,var(--brand),var(--brand-2)); transition:width .25s ease}
+
+    /* Form */
+    form{display:flex; flex-direction:column; gap:18px}
+    .fieldset{display:grid; grid-template-columns:repeat(12,1fr); gap:14px}
+    .field{grid-column:span 12; display:flex; flex-direction:column; gap:8px}
+    .field.half{grid-column:span 6}
+    .field.third{grid-column:span 4}
+    .field.two-third{grid-column:span 8}
+    @media (max-width:720px){.field.half,.field.third,.field.two-third{grid-column:span 12}}
+    label{font-weight:600; font-size:14px}
+    .hint{color:var(--muted); font-size:12px}
+    input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="datetime-local"], select, textarea{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06);
+      color:var(--text); outline:none; transition: box-shadow .2s ease, border-color .2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    textarea{min-height:120px; resize:vertical}
+    input:focus, select:focus, textarea:focus{border-color: rgba(124,92,255,0.6); box-shadow: 0 0 0 4px rgba(124,92,255,0.25)}
+    .chips{display:flex; flex-wrap:wrap; gap:8px}
+    .chip{padding:8px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08); cursor:pointer; font-size:12px}
+    .chip.selected{background:linear-gradient(135deg, rgba(124,92,255,0.3), rgba(34,211,238,0.3));}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .error{color:var(--err); font-size:12px}
+    .success{color:var(--ok)}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:12px}
+
+    /* Side panel */
+    .side{position:sticky; top:18px}
+    .summary{font-size:13px; color:var(--muted); max-height:70vh; overflow:auto}
+    .summary pre{white-space:pre-wrap; word-break:break-word}
+
+    /* Footer */
+    .footer{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:16px; border-top:1px solid rgba(255,255,255,0.08)}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,6,20,0.7); z-index:50}
+    .modal.show{display:flex}
+    .modal .dialog{width:min(680px,92vw); background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-xl); box-shadow:var(--shadow)}
+    .modal .dialog .inner{padding:22px}
+
+    .divider{height:1px; background:rgba(255,255,255,0.08); margin:8px 0}
+    .visually-hidden{position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap}
+
+    /* Signature pad */
+    .sig-pad{border-radius:12px; border:1px dashed rgba(255,255,255,0.25); background:rgba(255,255,255,0.04); height:160px}
+
+    /* Theme toggle */
+    .theme-toggle{margin-left:auto}
+    .light{
+      --bg:#f5f7fb; --card: #ffffff; --card-strong:#ffffff; --text:#0d1321; --muted:#4a5568; --shadow: 0 10px 30px rgba(13,19,33,0.08), inset 0 1px 0 rgba(255,255,255,1);
+    }
+    .light .logo{box-shadow:0 10px 30px rgba(13,19,33,0.12)}
+    .light input, .light select, .light textarea{background:#fff; border-color:#e6e8ef; box-shadow:none}
+    .light .card{border-color:#e9ecf3}
+    .light .step{background:#f2f4f9; border-color:#e7ebf5}
+    .light .summary{color:#4a5568}
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+            <path d="M4 12C4 7.582 7.582 4 12 4s8 3.582 8 8-3.582 8-8 8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 8v8M8 12h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>IRU Business Group Ltd — Interview Application</h1>
+          <div class="subtitle">Apply to be interviewed on <strong>IRU TV</strong>, <strong>Frame & Tune Studio</strong>, <strong>Epishow TV</strong>, or <strong>All About TV</strong>.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="loadDraftBtn" type="button">Load Draft</button>
+        <button class="btn" id="saveDraftBtn" type="button">Save Draft</button>
+        <button class="btn theme-toggle" id="themeToggle" type="button" aria-pressed="false">Toggle Theme</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="stepper" aria-label="Progress steps">
+          <div class="step" data-step-indicator="1"><span class="num">1</span> Profile</div>
+          <div class="step" data-step-indicator="2"><span class="num">2</span> Story</div>
+          <div class="step" data-step-indicator="3"><span class="num">3</span> Channel</div>
+          <div class="step" data-step-indicator="4"><span class="num">4</span> Schedule</div>
+          <div class="step" data-step-indicator="5"><span class="num">5</span> Consent</div>
+        </div>
+        <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+
+        <div class="inner">
+          <form id="applicationForm" novalidate>
+
+            <!-- STEP 1: Profile -->
+            <fieldset class="fieldset" data-step="1">
+              <legend class="visually-hidden">Applicant Profile</legend>
+              <div class="field half">
+                <label for="fullName">Full Name <span aria-hidden="true">*</span></label>
+                <input id="fullName" name="fullName" type="text" required placeholder="e.g., Kalimba Nyirishema" autocomplete="name" />
+                <div class="hint">Your legal name or the name you'd like displayed on screen.</div>
+                <div class="error" data-error-for="fullName"></div>
+              </div>
+              <div class="field half">
+                <label for="email">Email <span aria-hidden="true">*</span></label>
+                <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email" />
+                <div class="error" data-error-for="email"></div>
+              </div>
+              <div class="field half">
+                <label for="phone">Phone / WhatsApp <span aria-hidden="true">*</span></label>
+                <input id="phone" name="phone" type="tel" required placeholder="e.g., +250 7XX XXX XXX" autocomplete="tel" />
+                <div class="hint">Include country code. Example (Rwanda): +250 7xx xxx xxx.</div>
+                <div class="error" data-error-for="phone"></div>
+              </div>
+              <div class="field half">
+                <label for="city">City & Country</label>
+                <input id="city" name="city" type="text" placeholder="e.g., Kigali, Rwanda" autocomplete="address-level2" />
+              </div>
+              <div class="field half">
+                <label for="language">Preferred Interview Language</label>
+                <select id="language" name="language">
+                  <option value="Kinyarwanda">Kinyarwanda</option>
+                  <option value="English">English</option>
+                  <option value="French">French</option>
+                  <option value="Swahili">Swahili</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="field half">
+                <label for="timezone">Your Time Zone</label>
+                <input id="timezone" name="timezone" type="text" placeholder="e.g., Africa/Kigali" />
+              </div>
+              <div class="field">
+                <label for="socials">Links (Socials, Portfolio, YouTube, etc.)</label>
+                <input id="socials" name="socials" type="url" placeholder="https://... (separate multiple with commas)" />
+                <div class="hint">Paste multiple links separated by commas.</div>
+              </div>
+              <div class="field">
+                <label for="headline">Your Headline (Short bio) <span aria-hidden="true">*</span></label>
+                <input id="headline" name="headline" type="text" required maxlength="120" placeholder="e.g., Entrepreneur turning challenges into opportunities" />
+                <div class="row"><span class="pill"><span id="headlineCount">0</span>/120</span></div>
+                <div class="error" data-error-for="headline"></div>
+              </div>
+              <div class="field">
+                <label for="portrait">Headshot / Portrait (optional)</label>
+                <input id="portrait" name="portrait" type="file" accept="image/*" />
+                <div class="hint">JPG/PNG. Max 5MB.</div>
+              </div>
+            </fieldset>
+
+            <!-- STEP 2: Story -->
+            <fieldset class="fieldset" data-step="2" hidden>
+              <legend class="visually-hidden">Story / Topic</legend>
+              <div class="field">
+                <label>Type of content you propose</label>
+                <div class="chips" id="contentTypes">
+                  <button type="button" class="chip" data-value="Life story">Life story</button>
+                  <button type="button" class="chip" data-value="Testimony">Testimony</button>
+                  <button type="button" class="chip" data-value="Entertainment">Entertainment</button>
+                  <button type="button" class="chip" data-value="News/Current affairs">News/Current affairs</button>
+                  <button type="button" class="chip" data-value="Education">Education</button>
+                  <button type="button" class="chip" data-value="Other">Other</button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="pitch">Your pitch — what makes this interview compelling? <span aria-hidden="true">*</span></label>
+                <textarea id="pitch" name="pitch" required minlength="60" maxlength="1200" placeholder="Describe your unique story, key moments, lessons, and what audience will gain... (60–1200 characters)"></textarea>
+                <div class="row">
+                  <span class="pill"><span id="pitchChars">0</span>/1200</span>
+                  <span class="pill">Words: <span id="pitchWords">0</span></span>
+                </div>
+                <div class="error" data-error-for="pitch"></div>
+              </div>
+              <div class="field half">
+                <label for="sensitivity">Does your story include sensitive topics?</label>
+                <select id="sensitivity" name="sensitivity">
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                  <option value="Unsure">Unsure</option>
+                </select>
+                <div class="hint" id="sensitivityNote" hidden>
+                  We'll plan additional safeguarding and consent steps for sensitive content.
+                </div>
+              </div>
+              <div class="field half">
+                <label for="sampleLinks">Sample links (optional)</label>
+                <input id="sampleLinks" name="sampleLinks" type="url" placeholder="YouTube/Drive/Articles — comma separated" />
+              </div>
+              <div class="field">
+                <label for="questions">Three questions you want us to ask</label>
+                <textarea id="questions" name="questions" placeholder="1) ... 2) ... 3) ..."></textarea>
+              </div>
+            </fieldset>
+
+            <!-- STEP 3: Channel -->
+            <fieldset class="fieldset" data-step="3" hidden>
+              <legend class="visually-hidden">Channel Preferences</legend>
+              <div class="field">
+                <label for="channels">Select preferred channel(s) <span aria-hidden="true">*</span></label>
+                <div class="chips" id="channels">
+                  <button type="button" class="chip" data-value="IRU TV">IRU TV</button>
+                  <button type="button" class="chip" data-value="Frame & Tune Studio">Frame & Tune Studio</button>
+                  <button type="button" class="chip" data-value="Epishow TV">Epishow TV</button>
+                  <button type="button" class="chip" data-value="All About TV">All About TV</button>
+                  <button type="button" class="chip" data-value="All Channels">All Channels</button>
+                </div>
+                <div class="error" data-error-for="channels"></div>
+              </div>
+              <div class="field" id="allChannelsReasonWrapper" hidden>
+                <label for="allChannelsReason">Why is your story suitable for <em>all</em> channels?</label>
+                <textarea id="allChannelsReason" name="allChannelsReason" placeholder="Explain audience fit and angle for each channel"></textarea>
+              </div>
+              <div class="field half">
+                <label for="format">Preferred format</label>
+                <select id="format" name="format">
+                  <option>In-studio</option>
+                  <option>On location</option>
+                  <option>Remote / online</option>
+                  <option>No preference</option>
+                </select>
+              </div>
+              <div class="field half">
+                <label for="duration">Ideal duration</label>
+                <select id="duration" name="duration">
+                  <option>10–15 min</option>
+                  <option>20–30 min</option>
+                  <option>45–60 min</option>
+                  <option>Over 60 min</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <!-- STEP 4: Schedule -->
+            <fieldset class="fieldset" data-step="4" hidden>
+              <legend class="visually-hidden">Availability & Logistics</legend>
+              <div class="field half">
+                <label for="availability">Earliest availability date</label>
+                <input id="availability" name="availability" type="datetime-local" />
+                <div class="hint">We'll confirm precise time with you.</div>
+              </div>
+              <div class="field half">
+                <label for="travel">Can you travel to our studio (if required)?</label>
+                <select id="travel" name="travel">
+                  <option>Yes</option>
+                  <option>No</option>
+                  <option>Maybe</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="tech">Technical checks (remote): Internet speed, mic/camera</label>
+                <textarea id="tech" name="tech" placeholder="e.g., 25 Mbps+, USB mic, quiet room"></textarea>
+              </div>
+              <div class="field">
+                <label for="notes">Other notes or requests</label>
+                <textarea id="notes" name="notes" placeholder="Anything we should know"></textarea>
+              </div>
+            </fieldset>
+
+            <!-- STEP 5: Consent -->
+            <fieldset class="fieldset" data-step="5" hidden>
+              <legend class="visually-hidden">Agreements & Signature</legend>
+              <div class="field">
+                <label>Agreements</label>
+                <div class="row">
+                  <label class="pill"><input type="checkbox" id="consentPublish" /> <span>I grant IRU Business Group Ltd the right to record and publish my interview.</span></label>
+                </div>
+                <div class="row">
+                  <label class="pill"><input type="checkbox" id="consentRules" /> <span>I agree to community guidelines and respectful conduct.</span></label>
+                </div>
+                <div class="row">
+                  <label class="pill"><input type="checkbox" id="consentContact" /> <span>You may contact me about scheduling & updates.</span></label>
+                </div>
+                <div class="error" data-error-for="consent"></div>
+              </div>
+              <div class="field">
+                <label for="signature">Signature (draw)</label>
+                <canvas id="signature" class="sig-pad" aria-label="Signature pad"></canvas>
+                <div class="row">
+                  <button class="btn" type="button" id="clearSig">Clear</button>
+                  <span class="hint">Use your mouse or finger to sign.</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="uploadDocs">Attach supporting files (optional)</label>
+                <input id="uploadDocs" name="uploadDocs" type="file" accept="image/*,application/pdf,video/*" multiple />
+              </div>
+            </fieldset>
+
+            <div class="footer">
+              <div class="row">
+                <button type="button" class="btn" id="prevBtn">Back</button>
+                <button type="button" class="btn primary" id="nextBtn">Next</button>
+              </div>
+              <div class="row">
+                <span class="pill" id="autosaveStatus" aria-live="polite">Autosave: idle</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="card side">
+        <div class="inner">
+          <h3 style="margin-top:0">Your Application Snapshot</h3>
+          <div class="summary">
+            <pre id="jsonPreview">{}</pre>
+          </div>
+          <div class="divider"></div>
+          <div class="row">
+            <button class="btn" id="downloadJson" type="button">Download JSON</button>
+            <button class="btn" id="printBtn" type="button">Print</button>
+          </div>
+          <div class="divider"></div>
+          <small class="hint">This form is free. Submitting does not guarantee an interview. We review every application carefully.</small>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="dialog">
+      <div class="inner">
+        <h2 id="successTitle" style="margin-top:0">Application received 🎉</h2>
+        <p>Thank you for applying to be featured on our YouTube channels. We’ll review your submission and contact you if selected.</p>
+        <div class="row">
+          <button class="btn primary" id="closeModal">Close</button>
+          <button class="btn" id="exportSig">Download Signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const app = document.getElementById('app');
+      const form = document.getElementById('applicationForm');
+      const steps = Array.from(document.querySelectorAll('[data-step]'));
+      const stepIndicators = Array.from(document.querySelectorAll('[data-step-indicator]'));
+      const progressBar = document.getElementById('progressBar');
+      const nextBtn = document.getElementById('nextBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const jsonPreview = document.getElementById('jsonPreview');
+      const autosaveStatus = document.getElementById('autosaveStatus');
+      const headline = document.getElementById('headline');
+      const headlineCount = document.getElementById('headlineCount');
+      const pitch = document.getElementById('pitch');
+      const pitchChars = document.getElementById('pitchChars');
+      const pitchWords = document.getElementById('pitchWords');
+      const sensitivity = document.getElementById('sensitivity');
+      const sensitivityNote = document.getElementById('sensitivityNote');
+      const channelsGroup = document.getElementById('channels');
+      const allChannelsReasonWrapper = document.getElementById('allChannelsReasonWrapper');
+      const themeToggle = document.getElementById('themeToggle');
+      const printBtn = document.getElementById('printBtn');
+      const downloadJson = document.getElementById('downloadJson');
+      const successModal = document.getElementById('successModal');
+      const closeModal = document.getElementById('closeModal');
+      const exportSigBtn = document.getElementById('exportSig');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const loadDraftBtn = document.getElementById('loadDraftBtn');
+
+      let currentStep = 1;
+
+      // Theme
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        const pressed = themeToggle.getAttribute('aria-pressed') === 'true';
+        themeToggle.setAttribute('aria-pressed', String(!pressed));
+      });
+
+      // Input helpers
+      function updateHeadlineCount(){ headlineCount.textContent = headline.value.length; }
+      function updatePitchStats(){
+        pitchChars.textContent = pitch.value.length;
+        const words = pitch.value.trim().split(/\s+/).filter(Boolean);
+        pitchWords.textContent = words.length;
+      }
+      headline.addEventListener('input', updateHeadlineCount);
+      pitch.addEventListener('input', updatePitchStats);
+      updateHeadlineCount();
+      updatePitchStats();
+
+      // Sensitivity note
+      function updateSensitivityNote(){
+        const val = sensitivity.value;
+        sensitivityNote.hidden = !(val === 'Yes' || val === 'Unsure');
+      }
+      sensitivity.addEventListener('change', updateSensitivityNote);
+      updateSensitivityNote();
+
+      // Chips (multi-select)
+      function setupChips(groupId, {max = 0} = {}){
+        const group = document.getElementById(groupId);
+        group.addEventListener('click', (e)=>{
+          const btn = e.target.closest('.chip');
+          if(!btn) return;
+          if(max === 1){
+            group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            btn.classList.add('selected');
+          } else {
+            btn.classList.toggle('selected');
+          }
+          handleChannelExtras();
+          refreshPreview();
+        });
+        return () => Array.from(group.querySelectorAll('.chip.selected')).map(c=>c.dataset.value);
+      }
+      const getContentTypes = setupChips('contentTypes');
+      const getChannels = setupChips('channels');
+
+      function handleChannelExtras(){
+        const selected = getChannels();
+        const hasAll = selected.includes('All Channels');
+        allChannelsReasonWrapper.hidden = !hasAll;
+      }
+
+      // Stepper
+      function showStep(n){
+        currentStep = n;
+        steps.forEach(fs => fs.hidden = Number(fs.dataset.step) !== n);
+        stepIndicators.forEach(ind => ind.classList.toggle('active', Number(ind.dataset.stepIndicator) === n));
+        const pct = ((n-1) / (steps.length-1)) * 100; // 0..100
+        progressBar.style.width = pct + '%';
+        prevBtn.disabled = n === 1;
+        nextBtn.textContent = n === steps.length ? 'Submit' : 'Next';
+        // focus first field of current step
+        const firstField = steps[n-1].querySelector('input,select,textarea,button');
+        if(firstField) firstField.focus({preventScroll:true});
+      }
+      showStep(1);
+
+      prevBtn.addEventListener('click', ()=>{ if(currentStep>1){ showStep(currentStep-1); } });
+      nextBtn.addEventListener('click', ()=>{
+        if(currentStep < steps.length){
+          if(validateStep(currentStep)) showStep(currentStep+1);
+        } else {
+          if(validateAll()) submitForm();
+        }
+      });
+
+      // Validation
+      function setError(name, msg){
+        const el = document.querySelector(`[data-error-for="${name}"]`);
+        if(el){ el.textContent = msg || ''; }
+      }
+      function validateStep(stepIdx){
+        let ok = true;
+        // Clear errors for current step
+        steps[stepIdx-1].querySelectorAll('[data-error-for]').forEach(e=>e.textContent='');
+        const requiredByStep = {
+          1: ['fullName','email','phone','headline'],
+          2: ['pitch'],
+          3: ['channels'],
+          5: ['consent']
+        };
+        const fields = requiredByStep[stepIdx] || [];
+
+        fields.forEach(name=>{
+          if(name === 'channels'){
+            if(getChannels().length === 0){ setError('channels','Select at least one channel.'); ok=false; }
+          } else if(name === 'consent'){
+            const a = document.getElementById('consentPublish').checked;
+            const b = document.getElementById('consentRules').checked;
+            if(!(a && b)) { setError('consent','You must accept the required agreements.'); ok=false; }
+          } else {
+            const input = document.getElementById(name);
+            if(!input.checkValidity()){
+              setError(name, input.validationMessage || 'Please fill out this field.');
+              ok = false;
+            }
+          }
+        });
+
+        // Extra checks
+        if(stepIdx === 1){
+          const email = document.getElementById('email').value.trim();
+          if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setError('email','Enter a valid email address.'); ok=false; }
+          const phone = document.getElementById('phone').value.trim();
+          if(!/^\+?[0-9\s()-]{8,20}$/.test(phone)){ setError('phone','Enter a valid phone number with country code.'); ok=false; }
+        }
+        if(stepIdx === 2){
+          if(pitch.value.trim().length < 60) { setError('pitch','Please write at least 60 characters.'); ok=false; }
+        }
+        return ok;
+      }
+      function validateAll(){
+        return [1,2,3,4,5].every(validateStep);
+      }
+
+      // Collect data
+      function gather(){
+        const data = {
+          profile: {
+            fullName: document.getElementById('fullName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            language: document.getElementById('language').value,
+            timezone: document.getElementById('timezone').value.trim(),
+            socials: document.getElementById('socials').value.trim(),
+            headline: document.getElementById('headline').value.trim(),
+          },
+          story: {
+            types: getContentTypes(),
+            pitch: document.getElementById('pitch').value.trim(),
+            sensitivity: document.getElementById('sensitivity').value,
+            sampleLinks: document.getElementById('sampleLinks').value.trim(),
+            suggestedQuestions: document.getElementById('questions').value.trim(),
+          },
+          channel: {
+            preferred: getChannels(),
+            allChannelsReason: document.getElementById('allChannelsReason').value.trim(),
+            format: document.getElementById('format').value,
+            duration: document.getElementById('duration').value,
+          },
+          schedule: {
+            availability: document.getElementById('availability').value,
+            travel: document.getElementById('travel').value,
+            tech: document.getElementById('tech').value.trim(),
+            notes: document.getElementById('notes').value.trim(),
+          },
+          consent: {
+            publish: document.getElementById('consentPublish').checked,
+            rules: document.getElementById('consentRules').checked,
+            contact: document.getElementById('consentContact').checked,
+            signature: null,
+          },
+          meta: {
+            submittedAt: null,
+            version: '1.0.0'
+          }
+        };
+        try {
+          data.consent.signature = signaturePad.toDataURL();
+        } catch(err){ /* ignore if not available */ }
+        return data;
+      }
+
+      function refreshPreview(){
+        const data = gather();
+        jsonPreview.textContent = JSON.stringify(data, null, 2);
+      }
+
+      // Autosave
+      let autosaveTimer;
+      form.addEventListener('input', ()=>{
+        refreshPreview();
+        window.clearTimeout(autosaveTimer);
+        autosaveStatus.textContent = 'Autosave: pending…';
+        autosaveTimer = window.setTimeout(()=>{
+          localStorage.setItem('iru_application_draft', JSON.stringify(gather()));
+          autosaveStatus.textContent = 'Autosave: saved';
+        }, 800);
+      });
+      saveDraftBtn.addEventListener('click', ()=>{
+        localStorage.setItem('iru_application_draft', JSON.stringify(gather()));
+        autosaveStatus.textContent = 'Draft saved manually';
+      });
+      loadDraftBtn.addEventListener('click', ()=>{
+        const raw = localStorage.getItem('iru_application_draft');
+        if(!raw) return alert('No draft found.');
+        const data = JSON.parse(raw);
+        restore(data);
+      });
+
+      function restore(data){
+        if(!data) return;
+        const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val ?? el.value; };
+        const setBool = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
+        // profile
+        set('fullName', data?.profile?.fullName);
+        set('email', data?.profile?.email);
+        set('phone', data?.profile?.phone);
+        set('city', data?.profile?.city);
+        set('language', data?.profile?.language);
+        set('timezone', data?.profile?.timezone);
+        set('socials', data?.profile?.socials);
+        set('headline', data?.profile?.headline);
+        // story
+        (data?.story?.types||[]).forEach(v=>{
+          const chip = Array.from(document.querySelectorAll('#contentTypes .chip')).find(c=>c.dataset.value===v);
+          if(chip) chip.classList.add('selected');
+        });
+        set('pitch', data?.story?.pitch);
+        set('sensitivity', data?.story?.sensitivity);
+        set('sampleLinks', data?.story?.sampleLinks);
+        set('questions', data?.story?.suggestedQuestions);
+        // channel
+        (data?.channel?.preferred||[]).forEach(v=>{
+          const chip = Array.from(document.querySelectorAll('#channels .chip')).find(c=>c.dataset.value===v);
+          if(chip) chip.classList.add('selected');
+        });
+        set('allChannelsReason', data?.channel?.allChannelsReason);
+        set('format', data?.channel?.format);
+        set('duration', data?.channel?.duration);
+        // schedule
+        set('availability', data?.schedule?.availability);
+        set('travel', data?.schedule?.travel);
+        set('tech', data?.schedule?.tech);
+        set('notes', data?.schedule?.notes);
+        // consent
+        setBool('consentPublish', data?.consent?.publish);
+        setBool('consentRules', data?.consent?.rules);
+        setBool('consentContact', data?.consent?.contact);
+        refreshPreview();
+        handleChannelExtras();
+        updateHeadlineCount();
+        updatePitchStats();
+        updateSensitivityNote();
+      }
+
+      // Download JSON
+      downloadJson.addEventListener('click', ()=>{
+        const data = gather();
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `IRU_Interview_Application_${(data.profile.fullName||'Applicant').replace(/\s+/g,'_')}.json`;
+        a.click();
+      });
+
+      // Print
+      printBtn.addEventListener('click', ()=> window.print());
+
+      // Signature pad
+      const sig = document.getElementById('signature');
+      const ctx = sig.getContext('2d');
+      let drawing = false, lastX=0, lastY=0;
+      function resizeCanvas(){
+        const rect = sig.getBoundingClientRect();
+        const data = ctx.getImageData(0,0,sig.width,sig.height);
+        sig.width = rect.width * devicePixelRatio;
+        sig.height = rect.height * devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+        ctx.putImageData(data,0,0);
+      }
+      window.addEventListener('resize', resizeCanvas);
+      const signaturePad = {
+        toDataURL: ()=> sig.toDataURL('image/png'),
+        clear: ()=>{ ctx.clearRect(0,0,sig.width,sig.height); }
+      };
+      function startDraw(x,y){ drawing=true; lastX=x; lastY=y; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.strokeStyle='rgba(255,255,255,0.9)'; }
+      function draw(x,y){ if(!drawing) return; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke(); lastX=x; lastY=y; }
+      function stopDraw(){ drawing=false; }
+      sig.addEventListener('mousedown', e=> startDraw(e.offsetX, e.offsetY));
+      sig.addEventListener('mousemove', e=> draw(e.offsetX, e.offsetY));
+      sig.addEventListener('mouseup', stopDraw); sig.addEventListener('mouseleave', stopDraw);
+      sig.addEventListener('touchstart', e=>{ const r=sig.getBoundingClientRect(); const t=e.touches[0]; startDraw(t.clientX-r.left, t.clientY-r.top); e.preventDefault(); });
+      sig.addEventListener('touchmove', e=>{ const r=sig.getBoundingClientRect(); const t=e.touches[0]; draw(t.clientX-r.left, t.clientY-r.top); e.preventDefault(); });
+      sig.addEventListener('touchend', stopDraw);
+      resizeCanvas();
+      document.getElementById('clearSig').addEventListener('click', ()=> signaturePad.clear());
+
+      // Export signature
+      exportSigBtn.addEventListener('click', ()=>{
+        const url = sig.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url; a.download = 'signature.png'; a.click();
+      });
+
+      // Submit
+      function submitForm(){
+        if(!validateAll()) return;
+        const data = gather();
+        data.meta.submittedAt = new Date().toISOString();
+        jsonPreview.textContent = JSON.stringify(data, null, 2);
+        successModal.classList.add('show');
+        // In real use, send to backend here (fetch/POST)
+      }
+      closeModal.addEventListener('click', ()=> successModal.classList.remove('show'));
+
+      // Pre-fill timezone with best guess
+      try{ document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch(_){}
+
+      // Initialize preview
+      refreshPreview();
+    })();
+  </script>
+</body>
+</html>

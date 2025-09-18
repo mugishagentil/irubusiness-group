@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Mail } from "lucide-react";
 import emailjs from '@emailjs/browser'; // Make sure to install emailjs-browser package
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const NewsSubscription = () => {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Initialize emailjs with your public key once
@@ -53,7 +55,7 @@ const NewsSubscription = () => {
   };
 
   return (
-    <div className="min-h-fit flex items-center justify-center font-sans py-8 px-4" style={{ background: '#f5faff' }}>
+    <div className="min-h-fit flex items-center justify-center font-sans py-8 px-4 bg-white">
       <style>{componentStyles}</style>
 
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden px-6 py-10 lg:py-12 text-gray-800 border-t-8 border-yellow-500">
@@ -67,10 +69,10 @@ const NewsSubscription = () => {
               </span>
             </div>
             <h2 className="text-2xl lg:text-3xl font-bold leading-snug mb-2">
-              Subscribe to Our <span className="gradient-text">Newsletter</span>
+              {t('news.title')} <span className="gradient-text">{t('news.newsletter')}</span>
             </h2>
             <p className="text-gray-600 text-base lg:text-lg leading-relaxed">
-              Get the latest updates, news, and insights directly in your inbox. No spam, we promise.
+              {t('news.description')}
             </p>
           </div>
 
@@ -78,13 +80,13 @@ const NewsSubscription = () => {
           <div className="lg:w-1/2 w-full">
             {isSubscribed ? (
               <div className="p-4 bg-green-500 text-white rounded-lg text-center font-semibold animate-pulse">
-                Thank you for subscribing! 🎉
+                {t('news.success')}
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center w-full gap-4">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('news.placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="flex-grow w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-800 shadow-sm transition-all duration-300"
@@ -93,7 +95,7 @@ const NewsSubscription = () => {
                   type="submit"
                   className="w-full sm:w-auto bg-yellow-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-yellow-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
-                  Subscribe
+                  {t('news.subscribe')}
                 </button>
               </form>
             )}

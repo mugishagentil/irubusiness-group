@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IRU Business Group — Partnership / Shareholder Application</title>
+  <style>
+    :root{
+      --bg:#0f1724;--card:#0b1220;--accent1:#6ee7b7;--accent2:#60a5fa;--muted:#94a3b8;--glass: rgba(255,255,255,0.04);
+      --radius:16px; --maxw:980px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#021027 0%, #071426 60%);color:#e6eef8}
+    .container{max-width:var(--maxw);margin:32px auto;padding:28px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 40px rgba(2,6,23,0.7);}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#04263a}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+    .card{background:var(--card);border-radius:12px;padding:18px;margin-top:12px}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr} .side{order:2}}
+
+    form{display:flex;flex-direction:column;gap:14px}
+    .section-title{display:flex;align-items:center;gap:10px}
+    .section-title h2{margin:0;font-size:14px}
+    .hint{font-size:12px;color:var(--muted)}
+
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:13px;color:#cfe9ff}
+    input[type=text],input[type=email],input[type=number],select,textarea{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit;font-size:14px}
+    textarea{min-height:100px;resize:vertical}
+
+    .inline{display:flex;gap:10px}
+    .inline .field{flex:1}
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;font-size:13px}
+
+    .muted{color:var(--muted);font-size:13px}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent2),var(--accent1));color:#022043;border:none;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent1)}
+
+    .side{position:sticky;top:28px;height:max-content}
+    .summary{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.02))}
+
+    .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));width:0%}
+
+    .file-list{display:flex;flex-direction:column;gap:6px}
+    .file-item{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);font-size:13px;display:flex;justify-content:space-between}
+
+    .contrib-list{display:flex;flex-direction:column;gap:8px}
+    .contrib{padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.02));display:flex;justify-content:space-between;align-items:center}
+
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+    /* signature canvas */
+    .sig-wrap{background:rgba(0,0,0,0.16);padding:8px;border-radius:8px}
+    canvas{border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(0,0,0,0.02));width:100%;height:120px}
+
+    .toggle{display:inline-flex;align-items:center;gap:8px}
+    .small{font-size:13px}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.6));}
+    .modal .box{width:min(880px,95%);max-height:90vh;overflow:auto;padding:18px;border-radius:12px;background:linear-gradient(180deg,#021427,#052033)}
+
+    .kbd{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;font-weight:700}
+
+    /* tiny helpers */
+    .note{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo">IRU</div>
+        <div>
+          <h1>IRU Business Group — Partnership & Shareholder Application</h1>
+          <p class="lead">Smart, attractive and super-comprehensive form to apply as partner or shareholder in any IRU project.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <form id="appForm" class="card" autocomplete="off" novalidate>
+          <div class="section-title"><h2>1. Applicant / Entity Details</h2></div>
+          <div class="inline">
+            <div class="field"><label for="appName">Full Name / Entity Name</label><input id="appName" name="appName" type="text" required placeholder="John Doe or Acme Ltd"></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="name@company.com"></div>
+          </div>
+          <div class="inline">
+            <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="text" required placeholder="+250 78..." ></div>
+            <div class="field"><label for="country">Country</label><input id="country" name="country" type="text" placeholder="Rwanda" required></div>
+          </div>
+
+          <div class="field"><label for="type">Are you applying as</label>
+            <select id="type" name="type" required>
+              <option value="">Select role</option>
+              <option>Individual investor</option>
+              <option>Corporate / Company</option>
+              <option>Strategic partner (non-equity)</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="section-title"><h2>2. Project & Strategic Fit</h2></div>
+          <div class="field"><label for="project">Project name (or proposed)</label><input id="project" name="project" type="text" placeholder="E.g., Solar Distribution — Project A"></div>
+          <div class="field"><label for="summary">Brief project / involvement summary</label><textarea id="summary" name="summary" placeholder="Describe how you want to participate (funding, operations, tech...)" ></textarea></div>
+
+          <div class="section-title"><h2>3. Investment & Contribution</h2></div>
+          <div class="inline">
+            <div class="field"><label for="amount">Proposed Investment Amount (USD)</label><input id="amount" name="amount" type="number" min="0" step="0.01" placeholder="e.g., 50000"></div>
+            <div class="field"><label for="equity">Desired Equity (%)</label>
+              <input id="equity" name="equity" type="number" min="0" max="100" step="0.01" placeholder="e.g., 20"></div>
+          </div>
+
+          <div class="field"><label>Non-cash contributions (select / describe)</label>
+            <div class="chips" id="contribChips">
+              <button type="button" class="chip" data-val="Technical expertise">Technical expertise</button>
+              <button type="button" class="chip" data-val="Distribution network">Distribution network</button>
+              <button type="button" class="chip" data-val="IP/Technology">IP/Technology</button>
+              <button type="button" class="chip" data-val="Market access">Market access</button>
+              <button type="button" class="chip" data-val="Other">Other (specify below)</button>
+            </div>
+            <input id="contribOther" name="contribOther" type="text" placeholder="If Other, describe here" style="margin-top:8px">
+          </div>
+
+          <div class="section-title"><h2>4. Governance & Rights Preferences</h2></div>
+          <div class="field"><label for="board">Board representation desired</label>
+            <select id="board" name="board">
+              <option>None</option>
+              <option>Observer seat</option>
+              <option>1 board seat</option>
+              <option>Multiple seats (specify in comments)</option>
+            </select>
+          </div>
+          <div class="field"><label for="veto">Any special voting / veto rights requested?</label><input id="veto" name="veto" type="text" placeholder="E.g., veto on sale, borrowing > $X"></div>
+
+          <div class="section-title"><h2>5. Roles, KPIs & Deliverables</h2></div>
+          <div class="field"><label for="roleType">Preferred role</label>
+            <select id="roleType" name="roleType">
+              <option>Passive investor</option>
+              <option>Active partner - management</option>
+              <option>Strategic advisor</option>
+              <option>Technical lead</option>
+            </select>
+          </div>
+          <div class="field"><label for="kpis">Key expected deliverables / KPIs (milestones & timeline)</label><textarea id="kpis" name="kpis" placeholder="E.g., secure 100 customers in 12 months, close pilot by Q3..."></textarea></div>
+
+          <div class="section-title"><h2>6. Exit, Liquidity & Returns</h2></div>
+          <div class="field"><label for="dividend">Dividend preference</label>
+            <select id="dividend" name="dividend">
+              <option>Reinvest profits</option>
+              <option>Quarterly cash dividends</option>
+              <option>Annual cash dividends</option>
+              <option>Convertible instruments</option>
+            </select>
+          </div>
+          <div class="field"><label for="exit">Preferred exit routes</label><input id="exit" name="exit" type="text" placeholder="Buyback, third-party sale, IPO, etc."></div>
+
+          <div class="section-title"><h2>7. Legal, Compliance & Documents</h2></div>
+          <div class="field"><label>Upload supporting documents (Registration, Financials, Pitch, KYC)</label>
+            <input id="docs" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+            <div id="fileList" class="file-list"></div>
+          </div>
+
+          <div class="section-title"><h2>8. IP, Confidentiality & Ethics</h2></div>
+          <div class="field"><label for="ip">Do you expect any IP assignment or licensing terms?</label><input id="ip" name="ip" type="text" placeholder="Specify expectations"></div>
+          <div class="field"><label for="ethics">Corporate values / ESG expectations</label><textarea id="ethics" name="ethics" placeholder="Describe any ESG or ethical commitments you'd like included"></textarea></div>
+
+          <div class="section-title"><h2>9. Practical & Logistical</h2></div>
+          <div class="inline">
+            <div class="field"><label for="timeline">Proposed timeline (start — end)</label><input id="timeline" name="timeline" type="text" placeholder="e.g., Jun 2025 — Dec 2027"></div>
+            <div class="field"><label for="presence">In-person presence needs</label><select id="presence" name="presence"><option>Fully remote</option><option>Occasional visits</option><option>On-site / local</option></select></div>
+          </div>
+
+          <div class="section-title"><h2>10. Additional Notes & Team</h2></div>
+          <div class="field"><label for="team">Key team members / CVs (short)</label><textarea id="team" name="team" placeholder="List key people and short bios"></textarea></div>
+
+          <div class="section-title"><h2>11. Electronic Signature & Declaration</h2></div>
+          <div class="field">
+            <label>Sign to confirm accuracy & intent</label>
+            <div class="sig-wrap">
+              <canvas id="sigCanvas"></canvas>
+              <div style="display:flex;gap:8px;margin-top:8px"><button type="button" id="clearSig" class="btn ghost">Clear</button><span class="note">(Draw with mouse or finger)</span></div>
+            </div>
+          </div>
+
+          <div class="field"><label><input id="agree" type="checkbox"> I confirm the information provided is accurate and I agree to IRU's confidentiality terms.</label></div>
+
+          <footer>
+            <div>
+              <button type="button" id="saveDraft" class="btn ghost">Save draft</button>
+              <button type="button" id="loadDraft" class="btn ghost">Load draft</button>
+            </div>
+            <div>
+              <button type="button" id="previewBtn" class="btn">Preview & Export</button>
+              <button type="submit" class="btn">Submit Application</button>
+            </div>
+          </footer>
+        </form>
+      </main>
+
+      <aside class="side">
+        <div class="summary card">
+          <div class="section-title"><h2>Quick Summary</h2></div>
+          <div class="muted">Completion progress</div>
+          <div class="progress" aria-hidden><i id="prog"></i></div>
+
+          <div class="section-title" style="margin-top:8px"><h2>Live Snapshot</h2></div>
+          <div id="snapshot" class="muted">No data yet — start filling the form to see a summary here.</div>
+
+          <div style="margin-top:8px" class="section-title"><h2>Attachments</h2></div>
+          <div id="sideFiles" class="file-list"></div>
+
+          <div style="margin-top:8px" class="section-title"><h2>Actions</h2></div>
+          <div style="display:flex;gap:8px">
+            <button id="downloadJSON" class="btn ghost">Download JSON</button>
+            <button id="printBtn" class="btn">Print / Save PDF</button>
+          </div>
+
+          <div style="margin-top:8px" class="note">Tip: you can save a draft, come back later, preview and export. All data is stored locally and not sent unless you submit.</div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="modal" class="modal" role="dialog" aria-modal="true">
+      <div class="box">
+        <h3>Application Preview</h3>
+        <pre id="preview" style="white-space:pre-wrap;font-size:13px;color:#dff3ff"></pre>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button id="closeModal" class="btn ghost">Close</button>
+          <button id="confirmSubmit" class="btn">Confirm & Submit</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // util
+    const $ = (s, root=document) => root.querySelector(s);
+    const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+
+    const form = $('#appForm');
+    const prog = $('#prog');
+    const snapshot = $('#snapshot');
+    const fileList = $('#fileList');
+    const sideFiles = $('#sideFiles');
+    const docs = $('#docs');
+    const previewBtn = $('#previewBtn');
+    const modal = $('#modal');
+    const preview = $('#preview');
+    const closeModal = $('#closeModal');
+    const confirmSubmit = $('#confirmSubmit');
+    const saveDraft = $('#saveDraft');
+    const loadDraft = $('#loadDraft');
+
+    // signature
+    const canvas = $('#sigCanvas');
+    const clearSig = $('#clearSig');
+    let drawing=false, ctx;
+    function resizeCanvas(){ const dpr=window.devicePixelRatio||1; canvas.width = canvas.clientWidth * dpr; canvas.height = canvas.clientHeight * dpr; if(ctx){ctx.scale(dpr,dpr);} }
+    function initSig(){ ctx = canvas.getContext('2d'); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='white'; resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+      canvas.addEventListener('pointerdown', e=>{drawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY);});
+      canvas.addEventListener('pointermove', e=>{ if(!drawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
+      document.addEventListener('pointerup', ()=>{ drawing=false; });
+      clearSig.addEventListener('click', ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
+    }
+    initSig();
+
+    // chips selection
+    $$('#contribChips .chip').forEach(btn=>btn.addEventListener('click',()=>{ btn.classList.toggle('active'); btn.style.background = btn.classList.contains('active') ? 'linear-gradient(90deg,var(--accent1),var(--accent2))' : ''; }));
+
+    // file uploads
+    docs.addEventListener('change', ()=>{
+      fileList.innerHTML=''; sideFiles.innerHTML='';
+      Array.from(docs.files).forEach(f=>{
+        const el = document.createElement('div'); el.className='file-item'; el.textContent = f.name + ' • ' + Math.round(f.size/1024) + 'KB';
+        const rem = document.createElement('button'); rem.className='btn ghost'; rem.textContent='Remove'; rem.addEventListener('click', ()=>{ removeFile(f.name); }); el.appendChild(rem); fileList.appendChild(el);
+        const s = document.createElement('div'); s.className='file-item'; s.textContent = f.name; sideFiles.appendChild(s);
+      });
+    });
+    function removeFile(name){ const dt = new DataTransfer(); Array.from(docs.files).forEach(f=>{ if(f.name !== name) dt.items.add(f); }); docs.files = dt.files; docs.dispatchEvent(new Event('change')) }
+
+    // progress calculation
+    function updateProgress(){ const fields = ['appName','email','phone','country','type']; let filled=0; fields.forEach(id=>{ const v = $('#'+id).value; if(v && v.trim()!=='') filled++; }); const pct = Math.round((filled/fields.length)*100); prog.style.width = pct + '%'; prog.style.transition='width .4s'; prog.style.display='block'; prog.parentElement.querySelector('i').style.width = pct + '%'; prog.parentElement.querySelector('i').style.transition='width .4s'; }
+    setInterval(updateProgress,600);
+
+    // live snapshot
+    function buildSnapshot(){ const name = $('#appName').value || '—'; const proj = $('#project').value || '—'; const amount = $('#amount').value || '—'; const equity = $('#equity').value || '—'; snapshot.innerHTML = `<strong>${name}</strong><div class=muted>Project: ${proj}</div><div class=muted>Investment: ${amount} USD — Equity requested: ${equity}%</div>` }
+    setInterval(buildSnapshot,700);
+
+    // save/load draft
+    saveDraft.addEventListener('click', ()=>{
+      const data = gatherForm(true);
+      localStorage.setItem('iru_partner_draft', JSON.stringify(data));
+      alert('Draft saved locally. You can load it later on this browser.');
+    });
+    loadDraft.addEventListener('click', ()=>{
+      const raw = localStorage.getItem('iru_partner_draft'); if(!raw){alert('No draft found');return;} const data = JSON.parse(raw); populateForm(data); alert('Draft loaded');
+    });
+
+    function gatherForm(includeFiles=false){ const formData = {};
+      new FormData(form).forEach((v,k)=>{ formData[k]=v; });
+      // chips
+      formData.nonCash = $$('#contribChips .chip').filter(c=>c.classList.contains('active')).map(c=>c.dataset.val);
+      // signature
+      formData.signature = canvas.toDataURL();
+      if(includeFiles){ formData.files = Array.from(docs.files).map(f=>({name:f.name,size:f.size,type:f.type})); }
+      return formData;
+    }
+    function populateForm(data){ for(const k in data){ try{ const el = $('#'+k); if(el){ el.value = data[k]; } }catch(e){} }
+      // chips
+      $$('#contribChips .chip').forEach(c=>{ c.classList.toggle('active', data.nonCash && data.nonCash.includes(c.dataset.val)); c.style.background = c.classList.contains('active') ? 'linear-gradient(90deg,var(--accent1),var(--accent2))' : ''; });
+      // signature
+      if(data.signature){ const img = new Image(); img.onload = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width/ (window.devicePixelRatio||1), canvas.height/(window.devicePixelRatio||1)); }; img.src = data.signature; }
+    }
+
+    // preview
+    previewBtn.addEventListener('click', ()=>{ const out = gatherForm(true); preview.textContent = JSON.stringify(out,null,2); modal.style.display='flex'; });
+    closeModal.addEventListener('click', ()=>{ modal.style.display='none'; });
+
+    // submit (simulate)
+    form.addEventListener('submit', e=>{ e.preventDefault(); modal.style.display='flex'; preview.textContent = JSON.stringify(gatherForm(true),null,2); });
+    confirmSubmit.addEventListener('click', ()=>{
+      const data = gatherForm(true);
+      if(!data.appName || !data.email){ alert('Please fill required fields: Name and Email'); return; }
+      if(!$('#agree').checked){ alert('Please accept the declaration checkbox to proceed.'); return; }
+      // Here you'd normally POST to server. We'll simulate success.
+      modal.style.display='none';
+      localStorage.removeItem('iru_partner_draft');
+      alert('Application submitted! (Simulation) — a real submission would send your data to IRU Business Group.');
+      form.reset(); ctx.clearRect(0,0,canvas.width,canvas.height);
+      fileList.innerHTML=''; sideFiles.innerHTML=''; snapshot.innerHTML='No data yet';
+    });
+
+    // download json
+    $('#downloadJSON').addEventListener('click', ()=>{
+      const data = gatherForm(true); const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='iru_application.json'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // print
+    $('#printBtn').addEventListener('click', ()=>{ window.print(); });
+
+    // accessibility: keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{ if((e.ctrlKey || e.metaKey) && e.key==='s'){ e.preventDefault(); saveDraft.click(); } if((e.ctrlKey||e.metaKey) && e.key==='p'){ e.preventDefault(); $('#printBtn').click(); } });
+
+    // init small ui tweaks
+    updateProgress(); buildSnapshot();
+  </script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import { Play, ArrowRight, Sparkles, Zap, Target, Users, Globe } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import ContactModal from './ContactModal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function App() {
   return (
@@ -74,210 +76,133 @@ const AnimatedText = ({ text }) => {
 };
 
 const HeroSection = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-    setIsMenuOpen(false); // Close mobile menu after clicking
-  };
+  const { t } = useLanguage();
+  
+  // Parallax scrolling setup
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 300], [0, -150]);
+  const y2 = useTransform(scrollY, [0, 300], [0, -100]);
+  const y3 = useTransform(scrollY, [0, 300], [0, -50]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
 
   return (
-    <section id="home" className="relative min-h-screen pt-10 text-white">
-      {/* Responsive Navbar */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-[#1b1c20] shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <a href="/" className="flex items-center">
-                <img
-                  src="/IRU-Logo.jpg"
-                  alt="Irucore Logo"
-                  className="h-[60px] w-auto"
-                />
-              </a>
-              <span className="ml-5 text-white font-bold text-xl">
-                IRU BUSINESS{' '}
-                <span className="block text-sm font-normal text-gray-400">
-                  GROUP LTD
-                </span>
-              </span>
-            </div>
-
-            {/* Hamburger Icon - visible below lg */}
-            <div className="lg:hidden">
-              <button
-                onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="text-white focus:outline-none"
-                aria-label="Toggle menu"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            {/* Desktop Nav Links - visible lg and above */}
-            <div className="hidden lg:flex space-x-8">
-              <button
-                onClick={() => scrollToSection('home')}
-                className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer font-bold"
-              >
-                HOME
-              </button>
-              <button
-                onClick={() => scrollToSection('about')}
-                className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer font-bold"
-              >
-                ABOUT
-              </button>
-              <button
-                onClick={() => scrollToSection('services')}
-                className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer font-bold"
-              >
-                PROJECTS
-              </button>
-              <button
-                onClick={() => setIsContactModalOpen(true)}
-                className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer font-bold"
-              >
-                CONTACT US
-              </button>
-            </div>
-
-            {/* CTA on desktop - visible lg and above */}
-            <div className="hidden lg:flex items-center">
-              <div className="text-white text-sm text-right">
-                <p>Call us now</p>
-                <p className="font-bold text-yellow-400">+250 788 894 032</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu - visible below lg */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-[#1b1c20] px-4 pb-4 pt-2 space-y-2 shadow-lg">
-            <button
-              onClick={() => scrollToSection('home')}
-              className="block text-gray-300 hover:text-white transition w-full text-left"
-            >
-              HOME
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="block text-gray-300 hover:text-white transition w-full text-left"
-            >
-              ABOUT
-            </button>
-            <button
-              onClick={() => scrollToSection('services')}
-              className="block text-gray-300 hover:text-white transition w-full text-left"
-            >
-              PROJECTS
-            </button>
-            <button
-              onClick={() => setIsContactModalOpen(true)}
-              className="block text-gray-300 hover:text-white transition w-full text-left"
-            >
-              CONTACT US
-            </button>
-            <div className="pt-2 border-t border-gray-700">
-              <p className="text-sm text-white">Call us now</p>
-              <p className="text-sm font-bold text-yellow-400">+250 788 894 032</p>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <div className="relative min-h-screen flex items-end">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+    <section id="home" className="relative min-h-screen text-white overflow-hidden pt-0">
+      {/* Background with Parallax Effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <motion.div
+          style={{ y: y1 }}
+          className="absolute inset-0 w-full h-[120%]"
+        >
           <img
-            src="/Kigali.png"
+            src={`/Hero.jpg?v=${Date.now()}`}
             alt="City buildings and people"
             className="w-full h-full object-cover"
-            style={{ filter: 'brightness(30%)' }}
+            style={{ filter: 'brightness(60%) blur(1px)' }}
+            onError={(e) => {
+              console.log('Image failed to load, trying fallback');
+              e.currentTarget.src = '/Hero.png';
+            }}
           />
+        </motion.div>
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/30"
+          style={{ opacity }}
+        ></motion.div>
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 pb-32 pt-32 md:pt-0 text-white">
-          <div className="grid lg:grid-cols-2 gap-12 pt-1 lg:pt-32 items-center">
-
-            {/* Left */}
-            <div className="space-y-4 mb-20 max-w-lg">
-              <div className="space-y-2">
-                <span className="text-yellow-400 text-lg font-semibold tracking-widest">
-                  IRU BUSINESS GROUP LTD
+      {/* Main Content - Centered with Parallax */}
+      <motion.div 
+        className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6 lg:px-8"
+        style={{ y: y2 }}
+      >
+        <div className="max-w-4xl mx-auto">
+          {/* Pre-headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mb-4"
+          >
+            <span className="text-orange-400 text-lg font-medium tracking-wider uppercase">
+              {t('hero.preHeadline')}
                 </span>
+          </motion.div>
 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-extrabold leading-tight max-w-[28rem]">
-                  Innovative Solutions,
-                  <span className="block">Exceptional Results</span>
-                  <span className="text-yellow-400 block">
-                    <AnimatedText text="reputitative" />
-                  </span>
-                </h1>
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8"
+          >
+            {t('hero.headline')}
+            <br />
+            <span className="text-orange-400">{t('hero.headlineAccent')}</span>
+          </motion.h1>
 
-                <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed max-w-[28rem]">
-                  IRU Business Group Ltd is a dynamic multi-sector enterprise in Rwanda, delivering excellence across healthcare, technology, logistics, creative arts, and more. We combine innovation, quality, and customer focus to transform industries and empower communities.
-                </p>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="mb-16 flex flex-col sm:flex-row gap-4 justify-center"
+          >
                 <button
                   onClick={() => setIsContactModalOpen(true)}
-                  className="flex items-center justify-center bg-yellow-600 hover:bg-black transition-colors duration-200 text-white font-bold py-3 px-6 rounded-md shadow-lg">
-                  Contact Us - It's Free
-                  {/*<span className="ml-2">&gt;</span>*/}
+              className="group bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center"
+            >
+              {t('hero.cta')}
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
 
               <a
                 href="https://youtube.com/@irutv-2060?si=eOIiBW91MY16FBae"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center"
-              >
-                <button className="flex items-center justify-center bg-white text-gray-800 font-bold py-3 px-6 rounded-md shadow-lg border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
-                  <Play className="mr-2 h-4 w-4 fill-current text-yellow-600" />
-                  Learn More
-                </button>
-              </a>
-              
-              </div>
-            </div>
+              className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center"
+            >
+              <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+              {t('hero.watchChannel')}
+            </a>
+          </motion.div>
 
-            {/* Right Image */}
-            <div className="hidden lg:block relative text-right self-end">
-              <img
-                src="/Hero.png"
-                alt="Two consultants"
-                className="w-full h-auto max-w-md"
-              />
-            </div>
-          </div>
+          {/* Translucent Glass-morphism Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="flex justify-center space-x-4 mb-16"
+          >
+            {[
+              { label: t('hero.healthcare'), active: true, link: "/services" },
+              { label: t('hero.technology'), active: false, link: "/projects" },
+              { label: t('hero.logistics'), active: false, link: "/services" },
+              { label: t('hero.creativeArts'), active: false, link: "/projects" },
+              { label: t('hero.consulting'), active: false, link: "/contact" }
+            ].map((item, index) => (
+              <motion.a
+                key={index}
+                href={item.link}
+                className={`px-6 py-3 rounded-lg backdrop-blur-md border transition-all duration-300 ${
+                  item.active 
+                    ? 'bg-white/20 border-white/30 text-white' 
+                    : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/15'
+                }`}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${item.active ? 'bg-orange-400' : 'bg-white/60'}`}></div>
+                  <span className="text-sm font-medium">{item.label}</span>
+              </div>
+              </motion.a>
+            ))}
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
+
 
       {/* Contact Modal */}
       <ContactModal

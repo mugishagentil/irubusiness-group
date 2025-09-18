@@ -6,10 +6,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FAQSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const { t } = useLanguage();
 
   const faqs = [
     {
@@ -65,11 +67,10 @@ const FAQSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold gradient-text mb-6">
-            Frequently Asked Questions
+            {t('faq.title')}
           </h2>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Got questions? We've got answers. Here are the most common questions
-            our clients ask about our services and processes.
+            {t('faq.description')}
           </p>
         </div>
 

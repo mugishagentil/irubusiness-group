@@ -8,7 +8,7 @@ export default function App() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   return (
-    <div className="bg-[#1b1c20] min-h-screen p-8 flex items-center justify-center">
+    <div className="bg-white min-h-screen p-8 flex items-center justify-center">
       <ConsultantSection setIsContactModalOpen={setIsContactModalOpen} />
       <ContactModal
         isOpen={isContactModalOpen}
@@ -37,8 +37,8 @@ const DonutChart = () => {
   return (
     <div className="relative w-40 h-40">
       <svg className="absolute top-0 left-0" width="100%" height="100%" viewBox="0 0 40 40">
-        <circle className="text-[#2a2c34] stroke-current" strokeWidth="8" cx="20" cy="20" r="16" fill="transparent" />
-        <circle className="text-yellow-400 stroke-current transition-all duration-1000 ease-in-out"
+        <circle className="text-gray-200 stroke-current" strokeWidth="8" cx="20" cy="20" r="16" fill="transparent" />
+        <circle className="text-orange-500 stroke-current transition-all duration-1000 ease-in-out"
           strokeWidth="8" strokeDasharray={`${likeStroke} 1000`} cx="20" cy="20" r="16"
           fill="transparent" strokeLinecap="round" transform="rotate(-90 20 20)" />
         <circle className="text-gray-400 stroke-current transition-all duration-1000 ease-in-out"
@@ -48,7 +48,7 @@ const DonutChart = () => {
           strokeWidth="8" strokeDasharray={`${newStroke} 1000`} cx="20" cy="20" r="16"
           fill="transparent" strokeLinecap="round" transform={`rotate(${likeStroke + commentStroke - 90} 20 20)`} />
       </svg>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1b1c20] w-24 h-24 rounded-full"></div>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white w-24 h-24 rounded-full"></div>
     </div>
   );
 };
@@ -67,11 +67,11 @@ const ProgressBar = ({ label, percentage }) => {
   return (
     <div className="mb-2">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-gray-100">{label}</span>
-        <span className="text-white font-bold">{progress}%</span>
+        <span className="text-gray-600">{label}</span>
+        <span className="text-gray-900 font-bold">{progress}%</span>
       </div>
-      <div className="w-full bg-[#2a2c34] rounded-full h-2">
-        <div className="bg-yellow-400 h-2 rounded-full transition-all duration-1000 ease-in-out"
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="bg-orange-500 h-2 rounded-full transition-all duration-1000 ease-in-out"
           style={{ width: `${progress}%` }}></div>
       </div>
     </div>
@@ -98,49 +98,49 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 // Consultant Section
 const ConsultantSection = ({ setIsContactModalOpen }) => {
   return (
-    <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 bg-[#2a2c34] rounded-lg shadow-2xl">
+    <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 bg-gray-50 rounded-lg shadow-2xl">
       <div className="grid lg:grid-cols-2 gap-12">
 
         <ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-[#1b1c20] p-6 rounded-lg flex flex-col items-center justify-center md:items-start text-center md:text-left">
+            <div className="bg-white p-6 rounded-lg flex flex-col items-center justify-center md:items-start text-center md:text-left shadow-lg">
               <DonutChart />
               <div className="flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
                 <div className="flex items-center">
-                  <span className="inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
-                  <span className="text-gray-100">Like</span>
+                  <span className="inline-block w-3 h-3 bg-orange-500 rounded-full mr-2"></span>
+                  <span className="text-gray-700">Like</span>
                 </div>
                 <div className="flex items-center">
                   <span className="inline-block w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
-                  <span className="text-gray-100">Comment</span>
+                  <span className="text-gray-700">Comment</span>
                 </div>
                 <div className="flex items-center">
                   <span className="inline-block w-3 h-3 bg-lime-500 rounded-full mr-2"></span>
-                  <span className="text-gray-100">New</span>
+                  <span className="text-gray-700">New</span>
                 </div>
               </div>
             </div>
 
             <ScrollReveal delay={0.2}>
-              <div className="bg-[#1b1c20] p-6 rounded-lg text-center md:text-left flex flex-col justify-center">
-                <p className="text-gray-100 mb-4">
+              <div className="bg-white p-6 rounded-lg text-center md:text-left flex flex-col justify-center">
+                <p className="text-gray-600 mb-4">
                   To be a leading multi-sectoral enterprise in Africa, known for delivering innovative, sustainable, and high-quality products and services that transform communities and industries.
                 </p>
-                <p className="text-5xl font-extrabold text-white">Vision</p>
+                <p className="text-5xl font-extrabold text-gray-900">Vision</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={0.4}>
-              <div className="bg-[#1b1c20] p-6 rounded-lg text-center md:text-left flex flex-col justify-center">
-                <p className="text-gray-100 mb-4">
+              <div className="bg-white p-6 rounded-lg text-center md:text-left flex flex-col justify-center">
+                <p className="text-gray-600 mb-4">
                   We drive progress by providing top-tier solutions across healthcare, technology, logistics, creative arts, and other strategic sectors, ensuring excellence, efficiency, and customer satisfaction.
                 </p>
-                <p className="text-5xl font-extrabold text-white">Mission</p>
+                <p className="text-5xl font-extrabold text-gray-900">Mission</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={0.6}>
-              <div className="bg-[#1b1c20] p-6 rounded-lg flex flex-col justify-center">
+              <div className="bg-white p-6 rounded-lg flex flex-col justify-center shadow-lg">
                 <ProgressBar label="Problem Solving" percentage={75} />
                 <ProgressBar label="Adept Educator" percentage={85} />
                 <ProgressBar label="Pragmatic" percentage={70} />
@@ -156,10 +156,10 @@ const ConsultantSection = ({ setIsContactModalOpen }) => {
             <h4 className="text-sm text-yellow-400 font-semibold tracking-widest uppercase">
               Totally Committed
             </h4>
-            <h2 className="text-4xl font-bold text-white leading-tight">
+            <h2 className="text-4xl font-bold text-gray-900 leading-tight">
               How to find the best consultant?
             </h2>
-            <p className="text-gray-100 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               Choose a partner with the vision to see opportunities where others see challenges, the integrity to uphold the highest ethical standards, and the expertise to deliver excellence across multiple sectors. IRU Business Group Ltd offers:
             </p>
 
@@ -173,7 +173,7 @@ const ConsultantSection = ({ setIsContactModalOpen }) => {
               ].map((point, i) => (
                 <li key={i} className="flex items-start text-lg">
                   <ChevronRight className="h-6 w-6 text-yellow-400 mr-3 mt-1 flex-shrink-0" />
-                  <span className="text-gray-100">{point}</span>
+                  <span className="text-gray-600">{point}</span>
                 </li>
               ))}
             </ul>

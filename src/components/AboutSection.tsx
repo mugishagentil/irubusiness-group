@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const useInView = (options = {}) => {
   const ref = useRef(null);
@@ -26,25 +28,32 @@ const useInView = (options = {}) => {
 const AboutSection = () => {
   const [leftRef, leftInView] = useInView();
   const [rightRef, rightInView] = useInView();
+  const { t } = useLanguage();
+  
+  // Parallax scrolling setup
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 1000], [0, -200]);
+  const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
 
   return (
-    <section id="about" className="relative bg-[#2a2c34] text-white px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32">
+    <section id="about" className="relative bg-white text-gray-900 px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32">
       <div className="max-w-7xl mx-auto py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">
 
         {/* Left Column */}
-        <div
+        <motion.div
           ref={leftRef}
-          className={`bg-[#1b1c20] rounded-lg p-8 shadow-2xl transform transition-all duration-700 ease-out
+          className={`bg-gray-50 rounded-lg p-8 shadow-2xl transform transition-all duration-700 ease-out
             ${leftInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          style={{ y: y1 }}
         >
-          <h4 className="text-sm text-yellow-400 font-semibold tracking-widest uppercase mb-2">
-            Key Benefits
+          <h4 className="text-sm text-orange-500 font-semibold tracking-widest uppercase mb-2">
+            {t('about.badge')}
           </h4>
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight mb-6 max-w-[480px]">
-            Why should choose us?
+            {t('about.title')}
           </h2>
-          <p className="text-gray-300 mb-6 leading-relaxed max-w-[480px]">
-            At IRU Business Group Ltd, we believe our clients deserve more than just a service...
+          <p className="text-gray-600 mb-6 leading-relaxed max-w-[480px]">
+            {t('about.description')}
           </p>
           <ul className="space-y-4 max-w-[480px]">
             {[
@@ -55,18 +64,19 @@ const AboutSection = () => {
               "Customer-focused approach ensuring satisfaction at every stage.",
             ].map((item, i) => (
               <li key={i} className="flex items-start text-base lg:text-lg">
-                <Check className="h-6 w-6 text-yellow-400 mr-3 mt-1 flex-shrink-0" />
+                <Check className="h-6 w-6 text-orange-500 mr-3 mt-1 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
         {/* Right Column */}
-        <div
+        <motion.div
           ref={rightRef}
           className={`flex flex-col gap-8 transform transition-all duration-700 ease-out delay-200
             ${rightInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          style={{ y: y2 }}
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg overflow-hidden shadow-2xl">
@@ -79,26 +89,26 @@ const AboutSection = () => {
 
           <div className="space-y-4 max-w-[480px]">
             <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight">
-              Core Values
+              {t('about.coreValues')}
             </h3>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-yellow text-xl font-bold">Innovation: </span>
-              Leveraging creativity and technology to solve real-world problems.
+            <p className="text-gray-600 leading-relaxed">
+              <span className="text-orange-500 text-xl font-bold">{t('about.innovation')} </span>
+              {t('about.innovationDesc')}
             </p>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-yellow text-xl font-bold">Quality: </span>
-              Committed to delivering superior products and services.
+            <p className="text-gray-600 leading-relaxed">
+              <span className="text-orange-500 text-xl font-bold">{t('about.quality')} </span>
+              {t('about.qualityDesc')}
             </p>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-yellow text-xl font-bold">Integrity: </span>
-              Conducting business with transparency and accountability.
+            <p className="text-gray-600 leading-relaxed">
+              <span className="text-orange-500 text-xl font-bold">{t('about.integrity')} </span>
+              {t('about.integrityDesc')}
             </p>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-yellow text-xl font-bold">Diversity: </span>
-              Operating across multiple sectors to create holistic growth.
+            <p className="text-gray-600 leading-relaxed">
+              <span className="text-orange-500 text-xl font-bold">{t('about.diversity')} </span>
+              {t('about.diversityDesc')}
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

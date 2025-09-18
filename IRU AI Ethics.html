@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRU AI Ethics Portal</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background:#f9fafd; margin:0; color:#333;}
+header {background:#0b3d91; color:white; text-align:center; padding:2rem;}
+header h1 {margin:0;}
+header p {margin:0.5rem 0 0 0; font-weight:300;}
+
+.container { max-width:1100px; margin:2rem auto; padding:0 1rem; }
+.search-container { margin-bottom:1.5rem; text-align:center; }
+.search-container input { width:80%; padding:0.7rem 1rem; border-radius:8px; border:1px solid #ccc; }
+
+.progress-container {background:#e0e0e0; border-radius:10px; margin-bottom:1.5rem;}
+.progress-bar {height:20px; background:#28a745; width:0%; border-radius:10px; text-align:center; color:white; line-height:20px; font-size:0.8rem;}
+
+section {background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); margin-bottom:1.5rem; overflow:hidden; }
+section h2 { background:#0b3d91; color:white; margin:0; padding:1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+section h2 span.toggle { font-size:1.2rem; transition:transform 0.3s ease; }
+section .content { display:none; padding:1rem 1.5rem; line-height:1.6; }
+ul { list-style:none; padding-left:0; }
+ul li { margin-bottom:0.8rem; padding-left:1.5rem; position:relative; }
+ul li::before { content:"✔"; position:absolute; left:0; color:#0b3d91; font-weight:bold; }
+.ack-btn { background:#0b3d91; color:white; border:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; float:right; margin-top:0.5rem; }
+.ack-btn.acknowledged { background:#28a745; }
+footer { text-align:center; padding:1.5rem 1rem; font-size:0.9rem; color:#777; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>IRU AI Ethics Portal</h1>
+<p>Internal AI Policies & Acknowledgment Tracking</p>
+</header>
+
+<div class="container">
+
+<div class="search-container">
+<input type="text" id="searchInput" placeholder="Search policies...">
+</div>
+
+<div class="progress-container">
+<div class="progress-bar" id="progressBar">0%</div>
+</div>
+
+<!-- Section 1: Core AI Ethical Principles -->
+<section data-keywords="human centric fairness accountability transparency privacy safety sustainability">
+<h2>Core AI Ethical Principles <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>Human-Centricity: AI augments human judgment; humans remain accountable.</li>
+<li>Fairness & Non-Discrimination: Avoid bias across gender, race, age, ability, culture, or socioeconomic background.</li>
+<li>Transparency & Explainability: AI decisions should be understandable and traceable.</li>
+<li>Privacy & Data Protection: Comply with GDPR, local laws, and internal data governance policies.</li>
+<li>Safety & Security: Systems must be robust, monitored, and protected from misuse or attacks.</li>
+<li>Accountability & Governance: Clear ownership and oversight by the AI Ethics Board.</li>
+<li>Sustainability: Consider environmental impact; energy-efficient and sustainable AI practices.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+<!-- Section 2: Standards for AI Development & Deployment -->
+<section data-keywords="standards deployment datasets training bias sandbox monitoring user third-party compliance">
+<h2>Standards for AI Development & Deployment <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>Diverse and representative datasets.</li>
+<li>Bias impact assessments required for all AI models.</li>
+<li>AI sandbox environments for safe testing before production.</li>
+<li>Risk classification: Low, Medium, High; human override required for critical systems.</li>
+<li>Continuous monitoring for drift, errors, or bias after deployment.</li>
+<li>User rights: opt-out options and informed AI interaction.</li>
+<li>Third-party and open-source tools must pass ethics compliance review.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+<!-- Section 3: AI Governance & Oversight -->
+<section data-keywords="governance board audit risk compliance oversight">
+<h2>AI Governance & Oversight <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>AI Ethics & Governance Board: multidisciplinary, approves high-impact AI projects.</li>
+<li>Risk framework: classifies AI systems from minimal to prohibited risk.</li>
+<li>Audit & Compliance: annual internal audit; independent external review every 2 years.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+<!-- Section 4: Internal Employee Guidelines -->
+<section data-keywords="employee training responsible reporting confidentiality">
+<h2>Internal Employee Guidelines <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>Use AI responsibly; no personal gain, manipulation, or unethical experiments.</li>
+<li>Confidentiality: protect sensitive company or client data from insecure AI platforms.</li>
+<li>Continuous learning: annual AI ethics training required.</li>
+<li>Reporting Misuse: anonymous whistleblowing channel available.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+<!-- Section 5: Prohibited AI Practices -->
+<section data-keywords="prohibited social scoring surveillance deepfakes manipulation harm">
+<h2>Prohibited AI Practices <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>Social scoring of individuals.</li>
+<li>Unauthorized mass surveillance.</li>
+<li>Manipulation of vulnerable populations (children, elderly, disabled).</li>
+<li>Deceptive deepfakes or AI-generated misinformation.</li>
+<li>AI applications causing irreversible harm to humans or the environment.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+<!-- Section 6: Future-Proofing & Innovation -->
+<section data-keywords="innovation labs global review policy future standards">
+<h2>Future-Proofing & Innovation <span class="toggle">+</span></h2>
+<div class="content">
+<ul>
+<li>Encourage ethical innovation labs to explore new AI applications.</li>
+<li>Participate in global AI ethics coalitions and standardization efforts.</li>
+<li>Policy review every 12 months to align with laws (e.g., EU AI Act) and emerging standards.</li>
+</ul>
+<button class="ack-btn">Acknowledge</button>
+</div>
+</section>
+
+</div>
+
+<footer>&copy; 2025 IRU Business Group Ltd.</footer>
+
+<script>
+// Toggle sections
+document.querySelectorAll('section h2').forEach(h2=>{
+  h2.addEventListener('click', ()=>{
+    const content = h2.parentElement.querySelector('.content');
+    content.style.display = content.style.display==='block'?'none':'block';
+    h2.querySelector('.toggle').textContent = content.style.display==='block'?'-':'+';
+  });
+});
+
+// Search filter
+document.getElementById('searchInput').addEventListener('input', e=>{
+  const filter = e.target.value.toLowerCase();
+  document.querySelectorAll('section').forEach(sec=>{
+    const keywords = sec.dataset.keywords;
+    sec.style.display = keywords.toLowerCase().includes(filter)?'block':'none';
+  });
+});
+
+// Acknowledgment buttons & progress
+const ackBtns = document.querySelectorAll('.ack-btn');
+let total = ackBtns.length;
+let acknowledged = 0;
+
+ackBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(!btn.classList.contains('acknowledged')){
+      btn.classList.add('acknowledged');
+      btn.textContent = 'Acknowledged';
+      acknowledged++;
+      updateProgress();
+    }
+  });
+});
+
+function updateProgress(){
+  const percent = Math.round((acknowledged/total)*100);
+  const bar = document.getElementById('progressBar');
+  bar.style.width = percent+'%';
+  bar.textContent = percent+'% Completed';
+}
+</script>
+
+</body>
+</html>

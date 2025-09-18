@@ -50,19 +50,6 @@ const ProjectsSection = () => {
         "We are passionate about capturing and creating beautiful moments. Based in Rwanda, our studio specializes in professional photography, cinematic videography, expert audio production, and immersive art experiences.",
       link: "https://frameandtunestudio.com/",
     },
-    {
-      image: "/Youtube.jpg",
-      title: "Our YouTube & Social Media",
-      description:
-        "We operate 5 YouTube channels and multiple social media platforms, sharing educational, entertaining, and engaging content for audiences in Rwanda and beyond.",
-      socialLinks: [
-        { icon: <FaYoutube />, url: "https://youtube.com/@irutv-2060?si=eOIiBW91MY16FBae" },
-        { icon: <FaYoutube />, url: "https://youtube.com/@frameandtunestudio?si=Upg-PLZzI9lMGnf0" },
-        { icon: <FaYoutube />, url: "https://youtube.com/@epishow-rwanda?si=-8xwC8_HedxG5S-A" },
-        { icon: <FaYoutube />, url: "https://youtube.com/@allabouttv-2060?si=LTOajQ5GmgoIvLbR" },
-        { icon: <FaYoutube />, url: "https://youtube.com/@newblood-v3s?si=K0ns_rgrFwYwYc9M" },
-      ],
-    },
   ];
 
   return (
