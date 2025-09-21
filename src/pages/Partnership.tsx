@@ -188,9 +188,9 @@ const Partnership = () => {
                 </div>
                 <CardDescription className="text-gray-600 leading-relaxed">
                   Commitment to sustainability, ESG standards, and positive community impact.
-                </CardDescription>
-              </CardHeader>
-            </Card>
+                  </CardDescription>
+                </CardHeader>
+              </Card>
           </div>
         </div>
       </section>
