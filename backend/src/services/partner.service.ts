@@ -18,14 +18,14 @@ export class PartnershipApplicationService {
   }
 
   // Get single partnership application by ID
-  static async findById(id: number) {
+  static async findById(id: string) {
     return prisma.partnershipApplication.findUnique({
       where: { id },
     });
   }
 
   // Update a partnership application
-  static async update(id: number, data: Partial<CreatePartnershipApplicationInput>) {
+  static async update(id: string, data: Partial<CreatePartnershipApplicationInput>) {
     return prisma.partnershipApplication.update({
       where: { id },
       data,
@@ -33,7 +33,7 @@ export class PartnershipApplicationService {
   }
 
   // Delete a partnership application
-  static async delete(id: number) {
+  static async delete(id: string) {
     return prisma.partnershipApplication.delete({
       where: { id },
     });

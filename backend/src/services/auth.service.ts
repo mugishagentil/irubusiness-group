@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 /** Generate JWT access token */
 export function signAccessToken(user: {
-  id: number;
+  id: string;
   email: string;
   role: UserRole;
 }) {

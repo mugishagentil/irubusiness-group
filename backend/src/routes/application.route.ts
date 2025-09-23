@@ -61,30 +61,6 @@ router.get("/interviews/:id",requireAuth,requireRole('admin'), InterviewApplicat
 /**
  * @openapi
  * /api/applications/interviews/{id}:
- *   patch:
- *     summary: Update interview application
- *     tags: [InterviewApplications]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateInterviewApplicationInput'
- *     responses:
- *       200:
- *         description: Interview application updated
- */
-router.patch("/interviews/:id",requireAuth,requireRole('admin'), InterviewApplicationController.update);
-
-/**
- * @openapi
- * /api/applications/interviews/{id}:
  *   delete:
  *     summary: Delete interview application
  *     tags: [InterviewApplications]
@@ -133,47 +109,7 @@ router.post(
  */
 router.get("/partners", requireAuth,requireRole('admin'),PartnershipApplicationController.findAll);
 
-/**
- * @openapi
- * /api/applications/partners/{id}:
- *   get:
- *     summary: Get a single partnership application
- *     tags: [PartnershipApplications]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Partnership application retrieved
- */
-router.get("/partners/:id", requireAuth,requireRole('admin'),PartnershipApplicationController.findById);
 
-/**
- * @openapi
- * /api/applications/partners/{id}:
- *   patch:
- *     summary: Update partnership application
- *     tags: [PartnershipApplications]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreatePartnershipApplicationInput'
- *     responses:
- *       200:
- *         description: Partnership application updated
- */
-router.patch("/partners/:id", requireAuth,requireRole('admin'),PartnershipApplicationController.update);
 
 /**
  * @openapi

@@ -21,7 +21,7 @@ export class PartnershipApplicationController {
 
   static async findById(req: Request, res: Response) {
     const { id } = req.params;
-    const result = await PartnershipApplicationService.findById(Number(id));
+    const result = await PartnershipApplicationService.findById(id);
     if (!result) return res.status(404).json({ message: "Not found" });
     res.json(result);
   }
@@ -30,7 +30,7 @@ export class PartnershipApplicationController {
     try {
       const { id } = req.params;
       const data = req.body;
-      const result = await PartnershipApplicationService.update(Number(id), data);
+      const result = await PartnershipApplicationService.update(id, data);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -39,7 +39,7 @@ export class PartnershipApplicationController {
 
   static async delete(req: Request, res: Response) {
     const { id } = req.params;
-    await PartnershipApplicationService.delete(Number(id));
+    await PartnershipApplicationService.delete(id);
     res.status(204).send();
   }
 }
