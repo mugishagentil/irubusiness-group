@@ -79,3 +79,18 @@ export const createPartnershipApplicationSchema = z.object({
 });
 
 export type CreatePartnershipApplicationInput = z.infer<typeof createPartnershipApplicationSchema>;
+
+export const createProjectSchema = z.object({
+  title: z.string().min(2),
+  client: z.string().min(2),
+  description: z.string(),
+  status: z.enum(["planning", "active", "completed", "onHold"]).optional(),
+  priority: z.enum(["low", "medium", "high"]).optional(),
+  budget: z.number().positive().optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  category: z.string().min(2),
+  progress: z.number().min(0).max(100).optional(),
+});
+
+export type CreateProjectInput = z.infer<typeof createProjectSchema>;
