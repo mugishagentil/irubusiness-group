@@ -7,7 +7,6 @@ import {
 } from "../controllers/auth.controller";
 import { validate } from "../middlewares/validate";
 import {
-  SignupDto,
   LoginDto,
   ForgotPasswordDto,
   ResetPasswordDto,

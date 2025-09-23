@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { rateLimiter } from "./config/rateLimit";
 import authRoutes from "./routes/auth.routes";
+import applicationRoutes from "./routes/application.route";
 import { errorHandler } from "./middlewares/error";
 import logger from "./utils/logger";
 import swaggerUi from "swagger-ui-express";
@@ -63,7 +64,7 @@ app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 // API routes
 app.use("/api/auth", rateLimiter, authRoutes);
-
+app.use("/api/applications", rateLimiter, applicationRoutes);
 // Error handler
 app.use(errorHandler);
 
