@@ -169,7 +169,7 @@ const PartnershipApplicationForm = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-800 py-20 pt-32">
+      <section className="bg-gradient-to-r from-orange-50 to-orange-100 py-20 pt-32">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">

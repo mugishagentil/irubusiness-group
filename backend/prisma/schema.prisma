@@ -1,0 +1,183 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  interviewer
+  partner
+}
+
+
+enum Language {
+  English
+  Kinyarwanda
+  French
+  Swahili
+  Other
+}
+
+enum Sensitivity {
+  No
+  Yes
+  Unsure
+}
+
+enum Format {
+  InStudio
+  OnLocation
+  Remote
+  NoPreference
+}
+
+enum Duration {
+  Min10to15
+  Min20to30
+  Min45to60
+  Over60
+}
+
+enum Travel {
+  Yes
+  No
+  Maybe
+}
+
+enum PartnerType {
+  Individual
+  Corporate
+  StrategicNonEquity
+  Other
+}
+
+enum BoardRepresentation {
+  None
+  Observer
+  OneSeat
+  MultipleSeats
+}
+
+enum RoleType {
+  PassiveInvestor
+  ActivePartnerManagement
+  StrategicAdvisor
+  TechnicalLead
+}
+
+enum DividendPreference {
+  Reinvest
+  QuarterlyCash
+  AnnualCash
+  ConvertibleInstruments
+}
+
+enum PresenceType {
+  FullyRemote
+  OccasionalVisits
+  OnSiteLocal
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  fullName     String
+  email     String   @unique
+  phone     String   @unique
+  password  String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  PasswordResetToken PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model InterviewApplication {
+  id                 String     @id @default(cuid())
+
+  // Step 1: Profile
+  fullName           String
+  email              String
+  phone              String
+  city               String?
+  language           Language   @default(English)
+  timezone           String?
+  socials            String?
+  headline           String     @db.VarChar(120)
+  portraitUrl        String?
+
+  // Step 2: Story
+  contentTypes       Json?
+  pitch              String
+  sensitivity        Sensitivity @default(No)
+  sampleLinks        String?
+  suggestedQuestions String?
+
+  // Step 3: Channel Preferences
+  channels           Json
+  allChannelsReason  String?
+  format             Format     @default(InStudio)
+  duration           Duration   @default(Min20to30)
+
+  // Step 4: Schedule & Logistics
+  availability       DateTime?
+  travel             Travel     @default(Yes)
+  tech               String?
+  notes              String?
+
+  // Step 5: Consent & Signature
+  consentPublish     Boolean
+  consentRules       Boolean
+  consentContact     Boolean?
+  signatureUrl       String?
+  uploadDocsUrls     Json?
+
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+
+model PartnershipApplication {
+  id               Int              @id @default(autoincrement())
+  appName          String
+  email            String
+  phone            String
+  country          String
+  type             PartnerType
+  project          String
+  summary          String
+  amount           Float
+  equity           Float
+  nonCash          String[]         // could be string array
+  contribOther     String?
+  board            BoardRepresentation
+  veto             String?
+  roleType         RoleType
+  kpis             String?
+  dividend         DividendPreference
+  exit             String?
+  docs             String[]          // file path or URL
+  ip               String?
+  ethics           String?
+  timeline         String?
+  presence         PresenceType
+  team             String?
+  signature        String?
+  agree            Boolean
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}

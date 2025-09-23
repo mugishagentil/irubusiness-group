@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IRU BUSINESS GROUP Ltd — Radial Ecosystem Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1724;
+    --panel:#0b1220;
+    --text:#e6eef8;
+    --muted:#9fb0c8;
+    --glass: rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--text);background:linear-gradient(180deg,#071028 0%, #081428 50%, #081930 100%);}
+  header{padding:28px 36px;text-align:center;}
+  header h1{margin:0;font-weight:700;letter-spacing:0.2px;font-size:28px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+  /* container */
+  #container{width:100%;height:calc(100vh - 110px);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+
+  /* svg area */
+  #canvas {
+    width:100%;
+    height:100%;
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    overflow:hidden;
+  }
+
+  /* tooltip */
+  .tooltip {
+    position: absolute;
+    pointer-events:none;
+    background: rgba(10,12,20,0.92);
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:8px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+    font-size:13px;
+    transform: translate(-50%, -120%);
+    white-space:nowrap;
+    display:none;
+    z-index:30;
+  }
+
+  /* modal */
+  .modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(3,6,12,0.6);
+    z-index:60;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-card {
+    width:100%;
+    max-width:560px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    border-radius:14px;
+    padding:22px;
+    box-shadow: 0 20px 50px rgba(2,8,30,0.7);
+    color:var(--text);
+  }
+  .modal-card h2{margin:0 0 8px;font-size:20px}
+  .modal-card p{color:var(--muted);margin:0 0 16px}
+  .modal-card .actions{display:flex;gap:10px;justify-content:flex-end}
+  .btn {
+    padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+  }
+  .btn-primary{background:#0b63ff;color:white}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+
+  /* legend / filters */
+  .controls {
+    position:absolute; left:18px; top:18px; z-index:50,;
+    background: rgba(5,8,14,0.35); padding:10px; border-radius:10px; backdrop-filter: blur(6px);
+    display:flex; gap:10px; align-items:center;
+  }
+  .chip {padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+  .chip.active {box-shadow: 0 8px 24px rgba(11,99,255,0.14);transform:translateY(-2px)}
+  .center-note {position:absolute; right:18px; top:18px; background:rgba(255,255,255,0.02); padding:8px 10px;border-radius:10px;color:var(--muted);font-size:13px}
+  @media (max-width:700px){ header h1{font-size:18px} .controls{left:12px;top:12px} .center-note{right:12px;top:12px;font-size:12px}}
+</style>
+</head>
+<body>
+  <header>
+    <h1>IRU BUSINESS GROUP Ltd — Interactive Ecosystem</h1>
+    <p>Radial network map: hover nodes, drag to rearrange, zoom/pan, click for details</p>
+  </header>
+
+  <div id="container">
+    <div id="canvas"></div>
+
+    <div class="controls" id="filters">
+      <div class="chip active" data-filter="all">All</div>
+      <div class="chip" data-filter="ai">AI & Tech</div>
+      <div class="chip" data-filter="health">Health & Care</div>
+      <div class="chip" data-filter="business">Business & Commerce</div>
+      <div class="chip" data-filter="lifestyle">Lifestyle & Community</div>
+    </div>
+
+    <div class="center-note">IRU BUSINESS GROUP Ltd (center)</div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <div class="modal" id="modal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <p id="modalDesc"></p>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+        <a id="modalLink" class="btn btn-primary" href="#" target="_blank">Learn More</a>
+      </div>
+    </div>
+  </div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+/* ========= DATA ========= */
+const nodes = [
+  { id: "IRU BUSINESS GROUP Ltd", group: "core", desc: "Parent company & innovation hub", link: "https://iru-businessgroup.com" },
+
+  /* AI & Tech */
+  { id: "IRUCORE AI", group: "ai", desc: "Core AI engine powering the IRU ecosystem", link: "https://iru-core.ai" },
+  { id: "IRU Genix", group: "ai", desc: "AI-driven drug discovery & development", link: "https://iru-genix.com" },
+  { id: "IRU Mechx", group: "ai", desc: "Robotics & mechanical AI solutions", link: "https://iru-mechx.com" },
+  { id: "IRU UMOJA", group: "ai", desc: "Pan-African collaboration & innovation hub", link: "https://iru-umoja.com" },
+
+  /* Health & Care */
+  { id: "IRUCARE", group: "health", desc: "Digital health & clinic management", link: "https://iru-care.com" },
+  { id: "IRU Haven", group: "health", desc: "Elderly care & caregiver network", link: "https://iru-haven.com" },
+
+  /* Business & Commerce */
+  { id: "IRU Mart", group: "business", desc: "Smart e-commerce marketplace", link: "https://iru-mart.com" },
+  { id: "IRU Board", group: "business", desc: "Secure virtual boardroom for executives", link: "https://iru-board.com" },
+  { id: "Corporate Website", group: "business", desc: "IRU Business Group corporate portal", link: "https://iru-businessgroup.com" },
+
+  /* Lifestyle & Community */
+  { id: "IRU Love", group: "lifestyle", desc: "Matchmaking & relationship platform", link: "https://iru-love.com" },
+  { id: "IRU OneLife", group: "lifestyle", desc: "Lifestyle & social hub (social aggregator)", link: "https://iru-onelife.com" },
+  { id: "Frame & Tune Studio", group: "lifestyle", desc: "Creative media & studio services", link: "https://frameandtune.com" },
+  { id: "IRU Chat", group: "lifestyle", desc: "Secure intelligent chat platform", link: "https://iru-chat.com" }
+];
+
+const links = nodes
+  .filter(n => n.id !== "IRU BUSINESS GROUP Ltd")
+  .map(n => ({ source: "IRU BUSINESS GROUP Ltd", target: n.id }));
+
+/* ========= SETUP ========= */
+const container = document.getElementById('canvas');
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight * 0.8;
+
+const svg = d3.select('#canvas').append('svg')
+  .attr('width', width)
+  .attr('height', height)
+  .call(d3.zoom().scaleExtent([0.45, 3]).on('zoom', (event) => { g.attr('transform', event.transform); }))
+  .on('dblclick.zoom', null);
+
+const g = svg.append('g');
+
+const color = d3.scaleOrdinal()
+  .domain(["core","ai","health","business","lifestyle"])
+  .range(["#ffd54d","#3aa0ff","#3ddc84","#ffb86b","#e86fb2"]);
+
+/* defs for glow */
+const defs = svg.append("defs");
+const glowFilter = defs.append("filter").attr("id","glow");
+glowFilter.append("feGaussianBlur").attr("stdDeviation","4.5").attr("result","coloredBlur");
+const feMerge = glowFilter.append("feMerge");
+feMerge.append("feMergeNode").attr("in","coloredBlur");
+feMerge.append("feMergeNode").attr("in","SourceGraphic");
+
+/* center pulse animation using radialGradient */
+const grad = defs.append("radialGradient").attr("id","pulseGrad");
+grad.append("stop").attr("offset","0%").attr("stop-color","#ffd54d").attr("stop-opacity","0.25");
+grad.append("stop").attr("offset","60%").attr("stop-color","#ffd54d").attr("stop-opacity","0.06");
+grad.append("stop").attr("offset","100%").attr("stop-color","rgba(255,213,77,0)");
+
+/* ========= SIMULATION ========= */
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d=>d.id).distance(180).strength(1.0))
+  .force('charge', d3.forceManyBody().strength(-700))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collide', d3.forceCollide().radius(d => d.id === "IRU BUSINESS GROUP Ltd" ? 70 : 35).iterations(2));
+
+/* links */
+const link = g.append('g').attr('stroke','rgba(255,255,255,0.06)').selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('stroke-width',1.2);
+
+/* nodes */
+const node = g.append('g').selectAll('g')
+  .data(nodes)
+  .join('g')
+  .attr('class','node')
+  .call(drag(simulation));
+
+/* orbits (category rings for visual effect) */
+const categories = {
+  ai: { radius: 260, color: '#3aa0ff' },
+  health: { radius: 320, color: '#3ddc84' },
+  business: { radius: 380, color: '#ffb86b' },
+  lifestyle: { radius: 440, color: '#e86fb2' }
+};
+Object.values(categories).forEach(cat=>{
+  g.append('circle').attr('cx', width/2).attr('cy', height/2)
+    .attr('r', cat.radius).attr('fill','none').attr('stroke', cat.color).attr('stroke-opacity',0.06).attr('stroke-width',1);
+});
+
+/* center halo */
+const centerGroup = g.append('g').attr('transform', `translate(${width/2},${height/2})`);
+centerGroup.append('circle').attr('r', 74).attr('fill','url(#pulseGrad)').attr('opacity',0.9);
+centerGroup.append('circle').attr('r',42).attr('fill', color('core')).attr('filter','url(#glow)').attr('stroke','#fff').attr('stroke-opacity',0.06);
+centerGroup.append('text').attr('text-anchor','middle').attr('dy',6).attr('fill','#08111a').attr('font-weight',700).text('IRU').style('font-size','16px');
+
+/* actual node circles & labels */
+node.append('circle')
+  .attr('r', d => d.id === "IRU BUSINESS GROUP Ltd" ? 28 : 16)
+  .attr('fill', d => color(d.group))
+  .attr('stroke', '#081426')
+  .attr('stroke-width', d => d.id === "IRU BUSINESS GROUP Ltd" ? 2.5 : 1.2)
+  .style('cursor','pointer')
+  .on('mouseover', (event,d) => showTooltip(event,d))
+  .on('mousemove', (event,d) => moveTooltip(event))
+  .on('mouseout', hideTooltip)
+  .on('click', (event,d) => openModal(d));
+
+node.append('text')
+  .text(d => d.id)
+  .attr('text-anchor','middle')
+  .attr('dy', d => d.id === "IRU BUSINESS GROUP Ltd" ? 44 : 30)
+  .attr('font-size', d => d.id === "IRU BUSINESS GROUP Ltd" ? '12px' : '11px')
+  .attr('fill','rgba(255,255,255,0.85)');
+
+/* tick */
+simulation.on('tick', () => {
+  link
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+/* center pulse animation loop (simple scale tween) */
+(function pulse(){
+  centerGroup.transition().duration(2000).attrTween('transform', ()=>{
+    return t => `translate(${width/2},${height/2}) scale(${1 + 0.02*Math.sin(t*6.28)})`;
+  }).on('end', pulse);
+})();
+
+/* drag helpers */
+function drag(sim) {
+  function started(event,d){
+    if(!event.active) sim.alphaTarget(0.2).restart();
+    d.fx = d.x; d.fy = d.y;
+  }
+  function dragged(event,d){ d.fx = event.x; d.fy = event.y; }
+  function ended(event,d){
+    if(!event.active) sim.alphaTarget(0);
+    // keep custom placed nodes fixed? we'll release to allow simulation settle
+    d.fx = null; d.fy = null;
+  }
+  return d3.drag().on('start',started).on('drag',dragged).on('end',ended);
+}
+
+/* tooltip modal elements */
+const tooltipEl = document.getElementById('tooltip');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const modalLink = document.getElementById('modalLink');
+
+function showTooltip(event,d){
+  tooltipEl.style.display = 'block';
+  tooltipEl.innerHTML = `<strong>${d.id}</strong><div style="font-size:12px;color:#c9dff5;margin-top:6px">${d.desc || ''}</div>`;
+  moveTooltip(event);
+  // glow effect
+  d3.select(event.currentTarget).transition().duration(180).attr('r', d => (d.id === "IRU BUSINESS GROUP Ltd"?32:20));
+}
+function moveTooltip(event){
+  const x = event.pageX, y = event.pageY;
+  tooltipEl.style.left = x + 'px';
+  tooltipEl.style.top = y + 'px';
+}
+function hideTooltip(event){
+  tooltipEl.style.display = 'none';
+  d3.select(event.currentTarget).transition().duration(180).attr('r', d => (d.id === "IRU BUSINESS GROUP Ltd"?28:16));
+}
+
+/* modal open/close */
+function openModal(d){
+  modal.style.display = 'flex';
+  modalTitle.textContent = d.id;
+  modalDesc.textContent = d.desc || "No description available.";
+  modalLink.href = d.link || "#";
+}
+function closeModal(){ modal.style.display = 'none'; }
+
+/* close modal on ESC or click outside */
+window.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+/* filter chips */
+const chips = document.querySelectorAll('.chip');
+chips.forEach(ch => ch.addEventListener('click', ()=> {
+  chips.forEach(c=>c.classList.remove('active'));
+  ch.classList.add('active');
+  const f = ch.getAttribute('data-filter');
+  applyFilter(f);
+}));
+
+function applyFilter(filter){
+  if(filter === 'all'){
+    node.style('display', 'block');
+    link.style('display','block');
+  } else {
+    node.style('display', d => d.group === filter || d.group === 'core' ? 'block' : 'none');
+    link.style('display', l => {
+      return (l.source.id === "IRU BUSINESS GROUP Ltd" && nodes.find(n=>n.id===l.target.id && (l.target = n) && (l.target.group===filter))) || false ? 'block' : (filter==='all' ? 'block' : 'none');
+    });
+  }
+}
+
+/* responsiveness */
+window.addEventListener('resize', () => {
+  const w = container.clientWidth; const h = container.clientHeight;
+  svg.attr('width', w).attr('height', h);
+  simulation.force('center', d3.forceCenter(w/2, h/2));
+  simulation.alpha(0.3).restart();
+});
+
+</script>
+</body>
+</html>

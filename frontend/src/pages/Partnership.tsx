@@ -56,7 +56,7 @@ const Partnership = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="py-20 pt-32" style={{ background: "linear-gradient(to bottom, #ffffff, #f0f0f0)" }}>
+      <section className="py-20 pt-32 bg-gradient-to-r from-orange-50 to-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-5xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
