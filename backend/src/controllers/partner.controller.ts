@@ -6,7 +6,15 @@ import { createPartnershipApplicationSchema } from "../types/other.dto";
 export class PartnershipApplicationController {
   static async create(req: Request, res: Response) {
     try {
-      const validatedData = createPartnershipApplicationSchema.parse(req.body);
+     const files = req.files as any;
+      const data = {
+        ...req.body,
+        docs: files?.docs? files.docs.map((f: Express.Multer.File) =>f.path.replace(/\\/g, "/")
+            )
+          : [],
+      };
+
+      const validatedData = createPartnershipApplicationSchema.parse(data);
       const result = await PartnershipApplicationService.create(validatedData);
       res.status(201).json(result);
     } catch (error: any) {

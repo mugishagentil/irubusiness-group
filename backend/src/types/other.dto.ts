@@ -74,7 +74,7 @@ export const createPartnershipApplicationSchema = z.object({
   timeline: z.string().optional(),
   presence: presenceTypeEnum,
   team: z.string().optional(),
-  signature: z.string().url().optional(),
+  signature: z.any().optional(),
   agree: z.boolean(),
 });
 

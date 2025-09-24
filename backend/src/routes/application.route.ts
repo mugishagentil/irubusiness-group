@@ -179,17 +179,44 @@ router.delete("/interviews/:id", requireAuth,requireRole('admin'),InterviewAppli
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreatePartnershipApplicationInput'
- *     responses:
- *       201:
- *         description: Partnership application created
+ *             type: object
+ *             properties:
+ *               companyName:
+ *                 type: string
+ *                 example: "My Company"
+ *               contactPerson:
+ *                 type: string
+ *                 example: "Jane Doe"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               phone:
+ *                 type: string
+ *                 example: "+250788123456"
+ *               website:
+ *                 type: string
+ *                 example: "https://mycompany.com"
+ *               message:
+ *                 type: string
+ *               docs:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *             required:
+ *               - companyName
+ *               - contactPerson
+ *               - email
+ *               - phone
  */
 router.post(
   "/partners",
+  upload.array("docs", 5), // accept up to 5 files
   PartnershipApplicationController.create
 );
+
 
 /**
  * @openapi

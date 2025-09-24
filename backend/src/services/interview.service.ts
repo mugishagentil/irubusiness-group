@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 export class InterviewApplicationService {
   // Create a new interview application
   static async create(data: any) {
-    // Map uploaded files (from multer)
     const prismaData = {
       ...data,
       channels: data.channels || [],
