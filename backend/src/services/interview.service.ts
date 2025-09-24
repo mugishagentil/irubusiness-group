@@ -1,19 +1,17 @@
 // src/services/interviewApplication.service.ts
 import { PrismaClient } from "@prisma/client";
-import { CreateInterviewApplicationInput } from "../types/other.dto";
 
 const prisma = new PrismaClient();
 
 export class InterviewApplicationService {
   // Create a new interview application
-  static async create(data: CreateInterviewApplicationInput) {
-    // Ensure optional JSON fields have defaults
+  static async create(data: any) {
+    // Map uploaded files (from multer)
     const prismaData = {
       ...data,
-      channels: data.channels || [], // required field
+      channels: data.channels || [],
       contentTypes: data.contentTypes || null,
-      uploadDocsUrls: data.uploadDocsUrls || null,
-      availability: data.availability ? new Date(data.availability) : null, // convert string to Date
+      availability: data.availability ? new Date(data.availability) : null,
       language: data.language || "English",
       sensitivity: data.sensitivity || "No",
       format: data.format || "InStudio",
@@ -39,12 +37,14 @@ export class InterviewApplicationService {
   }
 
   // Update an existing interview application
-  static async update(
-    id: string,
-    data: Partial<CreateInterviewApplicationInput>
-  ) {
+  static async update(id: string, data: any) {
     const prismaData = {
       ...data,
+      portraitPath: data.portraitUrl ? data.portraitUrl.path : undefined,
+      signaturePath: data.signatureUrl ? data.signatureUrl.path : undefined,
+      uploadDocsPaths: data.uploadDocsUrls
+        ? data.uploadDocsUrls.map((f: Express.Multer.File) => f.path)
+        : undefined,
       availability: data.availability ? new Date(data.availability) : undefined,
     };
 

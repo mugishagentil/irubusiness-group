@@ -23,7 +23,7 @@ export const createInterviewApplicationSchema = z.object({
   timezone: z.string().optional(),
   socials: z.string().optional(),
   headline: z.string().max(120),
-  portraitUrl: z.string().url().optional(),
+  portraitUrl: z.any().optional(),
 
   contentTypes: z.any().optional(), // JSON array
   pitch: z.string(),
@@ -44,7 +44,7 @@ export const createInterviewApplicationSchema = z.object({
   consentPublish: z.boolean(),
   consentRules: z.boolean(),
   consentContact: z.boolean().optional(),
-  signatureUrl: z.string().url().optional(),
+  signatureUrl: z.any().optional(),
   uploadDocsUrls: z.any().optional(), // JSON array
 });
 

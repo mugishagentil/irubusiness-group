@@ -4,6 +4,7 @@ import { InterviewApplicationController } from "../controllers/interview.control
 import { PartnershipApplicationController } from "../controllers/partner.controller";
 import { requireAuth } from "../middlewares/auth";
 import { requireRole } from "../middlewares/requireRole";
+import { upload } from "../middlewares/upload";
 
 const router = Router();
 
@@ -16,15 +17,108 @@ const router = Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateInterviewApplicationInput'
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: "John Doe"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               phone:
+ *                 type: string
+ *                 example: "+250793099772"
+ *               city:
+ *                 type: string
+ *                 example: "Kigali"
+ *               language:
+ *                 type: string
+ *                 example: "English"
+ *               timezone:
+ *                 type: string
+ *                 example: "Africa/Kigali"
+ *               socials:
+ *                 type: string
+ *                 example: "http://linkedin.com/johndoe"
+ *               headline:
+ *                 type: string
+ *                 example: "My Interview Headline"
+ *               portraitUrl:
+ *                 type: string
+ *                 format: binary
+ *               signatureUrl:
+ *                 type: string
+ *                 format: binary
+ *               contentTypes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Life story"]
+ *               pitch:
+ *                 type: string
+ *               sensitivity:
+ *                 type: string
+ *                 example: "Yes"
+ *               sampleLinks:
+ *                 type: string
+ *               suggestedQuestions:
+ *                 type: string
+ *               channels:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["IRU TV"]
+ *               allChannelsReason:
+ *                 type: string
+ *               format:
+ *                 type: string
+ *                 example: "In-studio"
+ *               duration:
+ *                 type: string
+ *                 example: "20–30 min"
+ *               availability:
+ *                 type: string
+ *                 format: date-time
+ *               travel:
+ *                 type: string
+ *                 example: "Yes"
+ *               tech:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *               consentPublish:
+ *                 type: boolean
+ *               consentRules:
+ *                 type: boolean
+ *               consentContact:
+ *                 type: boolean
+ *               uploadDocsUrls:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *             required:
+ *               - fullName
+ *               - email
+ *               - phone
+ *               - headline
+ *               - pitch
+ *               - channels
+ *               - consentPublish
+ *               - consentRules
  *     responses:
  *       201:
  *         description: Interview application created
  */
 router.post(
   "/interviews",
+  upload.fields([
+    { name: "portraitUrl", maxCount: 1 },
+    { name: "signatureUrl", maxCount: 1 }, 
+    { name: "uploadDocsUrls", maxCount: 5 },
+  ]),
   InterviewApplicationController.create
 );
 

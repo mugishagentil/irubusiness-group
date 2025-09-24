@@ -16,11 +16,16 @@ import {
   Calendar, 
   CheckCircle,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Home
 } from "lucide-react";
+import { InterviewApplicationsAPI } from "@/services/application";
+import { useNavigate } from "react-router-dom";
 
 const InterviewForm = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -30,7 +35,7 @@ const InterviewForm = () => {
     timezone: "",
     socials: "",
     headline: "",
-    portrait: null as File | null,
+    portraitUrl: null as File | null,
     contentTypes: [] as string[],
     pitch: "",
     sensitivity: "No",
@@ -47,11 +52,12 @@ const InterviewForm = () => {
     consentPublish: false,
     consentRules: false,
     consentContact: false,
-    signature: "",
-    uploadDocs: null as FileList | null
+    signatureUrl: "",
+    uploadDocsUrls: null as FileList | null
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const steps = [
     { id: 1, title: "Profile", icon: <User className="h-5 w-5" /> },
@@ -61,13 +67,8 @@ const InterviewForm = () => {
     { id: 5, title: "Consent", icon: <CheckCircle className="h-5 w-5" /> }
   ];
 
-  const channels = [
-    "IRU TV", "Frame & Tune Studio", "Epishow TV", "All About TV", "All Channels"
-  ];
-
-  const contentTypes = [
-    "Life story", "Testimony", "Entertainment", "News/Current affairs", "Education", "Other"
-  ];
+  const channels = ["IRU TV", "Frame & Tune Studio", "Epishow TV", "All About TV", "All Channels"];
+  const contentTypes = ["Life story", "Testimony", "Entertainment", "News/Current affairs", "Education", "Other"];
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -118,17 +119,12 @@ const InterviewForm = () => {
         if (formData.pitch.length > 1200) newErrors.pitch = "Pitch must be 1200 characters or less";
         break;
       case 3:
-        if (formData.channels.length === 0) {
-          newErrors.channels = "Please select at least one channel";
-        }
-        if (formData.channels.includes("All Channels") && !formData.allChannelsReason.trim()) {
+        if (formData.channels.length === 0) newErrors.channels = "Please select at least one channel";
+        if (formData.channels.includes("All Channels") && !formData.allChannelsReason.trim())
           newErrors.allChannelsReason = "Please explain why your story is suitable for all channels";
-        }
         break;
       case 5:
-        if (!formData.consentPublish || !formData.consentRules) {
-          newErrors.consent = "You must accept the required agreements";
-        }
+        if (!formData.consentPublish || !formData.consentRules) newErrors.consent = "You must accept the required agreements";
         break;
     }
     
@@ -136,16 +132,113 @@ const InterviewForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
+    
     if (validateStep(5)) {
-      alert("Application submitted successfully! We'll review your submission and contact you if selected.");
+      setIsSubmitting(true);
+      try {
+        console.log("Submitting form data:", formData);
+
+        // Maps for enums
+        const formatMap: Record<string, string> = {
+          "In-studio": "InStudio",
+          "On location": "OnLocation",
+          "Remote / online": "Remote",
+          "No preference": "NoPreference",
+        };
+
+        const durationMap: Record<string, string> = {
+          "10–15 min": "Min10to15",
+          "20–30 min": "Min20to30",
+          "45–60 min": "Min45to60",
+          "Over 60 min": "Over60",
+        };
+
+        const sensitivityMap: Record<string, string> = { "Yes": "Yes", "No": "No" };
+
+        const normalizedData = {
+          ...formData,
+          format: formatMap[formData.format] || "NoPreference",
+          duration: durationMap[formData.duration] || "Min20to30",
+          sensitivity: sensitivityMap[formData.sensitivity] || "No",
+          portraitUrl: formData.portraitUrl || null,
+          signatureUrl: formData.signatureUrl || null,
+          uploadDocsUrls: formData.uploadDocsUrls || [],
+          consentPublish: formData.consentPublish,
+          consentRules: formData.consentRules,
+          consentContact: formData.consentContact,
+        };
+
+        await InterviewApplicationsAPI.create(normalizedData);
+
+        console.log("API response: success");
+
+        // Show success message
+        setSubmitMessage({ 
+          type: "success", 
+          text: " Application submitted successfully! Redirecting to homepage..." 
+        });
+
+        // Wait a moment to show the success message, then redirect
+        setTimeout(() => {
+          navigate("/"); // Redirect to home page
+        }, 3000);
+
+      } catch (err: any) {
+        console.error("Submission error:", err);
+        setSubmitMessage({ 
+          type: "error", 
+          text: " Failed to send application. Please try again." 
+        });
+        
+        // Clear error message after 5 seconds
+        setTimeout(() => setSubmitMessage(null), 5000);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      city: "",
+      language: "English",
+      timezone: "",
+      socials: "",
+      headline: "",
+      portraitUrl: null,
+      contentTypes: [],
+      pitch: "",
+      sensitivity: "No",
+      sampleLinks: "",
+      suggestedQuestions: "",
+      channels: [],
+      allChannelsReason: "",
+      format: "In-studio",
+      duration: "20–30 min",
+      availability: "",
+      travel: "Yes",
+      tech: "",
+      notes: "",
+      consentPublish: false,
+      consentRules: false,
+      consentContact: false,
+      signatureUrl: "",
+      uploadDocsUrls: null,
+    });
+    setCurrentStep(1);
+    setErrors({});
   };
 
   const progressPercentage = ((currentStep - 1) / (steps.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
+  
       <style dangerouslySetInnerHTML={{
         __html: `
           .datetime-input {
@@ -171,47 +264,9 @@ const InterviewForm = () => {
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
             outline: none;
           }
-          
-          .datetime-input::-webkit-calendar-picker-indicator {
-            background: transparent;
-            bottom: 0;
-            color: transparent;
-            cursor: pointer;
-            height: auto;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: auto;
-          }
-          
-          .datetime-input::-webkit-datetime-edit {
-            padding: 0;
-          }
-          
-          .datetime-input::-webkit-datetime-edit-fields-wrapper {
-            padding: 0;
-          }
-          
-          .datetime-input::-webkit-datetime-edit-text {
-            color: #6b7280;
-            padding: 0 0.25rem;
-          }
-          
-          .datetime-input::-webkit-datetime-edit-month-field,
-          .datetime-input::-webkit-datetime-edit-day-field,
-          .datetime-input::-webkit-datetime-edit-year-field {
-            color: #111827;
-            padding: 0 0.25rem;
-          }
-          
-          .datetime-input::-webkit-datetime-edit-hour-field,
-          .datetime-input::-webkit-datetime-edit-minute-field {
-            color: #111827;
-            padding: 0 0.25rem;
-          }
         `
       }} />
+      
       <Header />
       
       {/* Hero Section */}
@@ -285,7 +340,7 @@ const InterviewForm = () => {
           </div>
 
           {/* Form Content */}
-          <div className="bg-gray-50 rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -294,7 +349,7 @@ const InterviewForm = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Step 1: Profile */}
+                             {/* Step 1: Profile */}
                 {currentStep === 1 && (
                   <div className="space-y-6">
                     <div className="text-center mb-8">
@@ -428,14 +483,14 @@ const InterviewForm = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="portrait" className="text-sm font-semibold text-gray-700">
+                      <Label htmlFor="portraitUrl" className="text-sm font-semibold text-gray-700">
                         Headshot / Portrait (optional)
                       </Label>
                       <Input
-                        id="portrait"
+                        id="portraitUrl"
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleInputChange('portrait', e.target.files?.[0] || null)}
+                        onChange={(e) => handleInputChange('portraitUrl', e.target.files?.[0] || null)}
                         className="mt-1"
                       />
                       <p className="text-sm text-gray-500 mt-1">JPG/PNG. Max 5MB.</p>
@@ -761,7 +816,7 @@ const InterviewForm = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="signature" className="text-sm font-semibold text-gray-700">
+                      <Label htmlFor="signatureUrl" className="text-sm font-semibold text-gray-700">
                         Signature (draw)
                       </Label>
                       <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg h-40 bg-gray-50 flex items-center justify-center">
@@ -772,7 +827,7 @@ const InterviewForm = () => {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => handleInputChange('signature', '')}
+                          onClick={() => handleInputChange('signatureUrl', '')}
                           className="hover:bg-gray-50 hover:text-black hover:border-gray-400"
                         >
                           Clear
@@ -782,46 +837,71 @@ const InterviewForm = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="uploadDocs" className="text-sm font-semibold text-gray-700">
+                      <Label htmlFor="uploadDocsUrls" className="text-sm font-semibold text-gray-700">
                         Attach supporting files (optional)
                       </Label>
                       <Input
-                        id="uploadDocs"
+                        id="uploadDocsUrls"
                         type="file"
                         accept="image/*,application/pdf,video/*"
                         multiple
-                        onChange={(e) => handleInputChange('uploadDocs', e.target.files)}
+                        onChange={(e) => handleInputChange('uploadDocsUrls', e.target.files)}
                         className="mt-1"
                       />
                     </div>
                   </div>
                 )}
+                
               </motion.div>
             </AnimatePresence>
 
             {/* Navigation Buttons */}
             <div className="flex justify-between items-center pt-8 border-t border-gray-200 mt-8">
-              <Button
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                variant="outline"
-                className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-black hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  variant="outline"
+                  className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-black hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={resetForm}
+                  variant="outline"
+                  className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-black hover:border-gray-400"
+                >
+                  <Home className="h-4 w-4" />
+                  Reset Form
+                </Button>
+              </div>
               
               <div className="flex items-center gap-4">
                 {currentStep === steps.length ? (
                   <Button
-                    onClick={handleSubmit}
-                    className="bg-orange-500 hover:bg-orange-600 hover:text-white text-white px-8 transition-all duration-200"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-orange-500 hover:bg-orange-600 hover:text-white text-white px-8 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Application
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit Application
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </>
+                    )}
                   </Button>
                 ) : (
                   <Button
+                    type="button"
                     onClick={nextStep}
                     className="bg-orange-500 hover:bg-orange-600 hover:text-white text-white px-8 transition-all duration-200"
                   >
@@ -830,8 +910,24 @@ const InterviewForm = () => {
                   </Button>
                 )}
               </div>
+              
+      {submitMessage && (
+        <div
+          className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white z-50 transition-all duration-300 ${
+            submitMessage.type === "success" ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          <p className="flex items-center gap-2">
+            {submitMessage.type === "success" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : null}
+            {submitMessage.text}
+          </p>
+        </div>
+      )}
+
             </div>
-          </div>
+          </form>
         </div>
       </section>
 

@@ -1,16 +1,51 @@
 // src/controllers/interviewApplication.controller.ts
 import { Request, Response } from "express";
 import { InterviewApplicationService } from "../services/interview.service";
-import { createInterviewApplicationSchema } from "../types/other.dto";
 
 export class InterviewApplicationController {
   // Create
   static async create(req: Request, res: Response) {
     try {
-     
-      const result = await InterviewApplicationService.create(req.body);
+      const files = req.files as any;
+
+      console.log("Received files:", files); // Debug log
+      console.log("Received body:", req.body); // Debug log
+
+      const data = {
+        ...req.body,
+
+        // Convert CSV/strings into arrays if needed
+        channels: Array.isArray(req.body.channels)
+          ? req.body.channels
+          : req.body.channels
+          ? [req.body.channels]
+          : [],
+        contentTypes: Array.isArray(req.body.contentTypes)
+          ? req.body.contentTypes
+          : req.body.contentTypes
+          ? [req.body.contentTypes]
+          : [],
+
+        // Files from multer - use correct field names
+        portraitUrl: files?.portraitUrl?.[0]?.path.replace(/\\/g, "/") || null,
+        signatureUrl:files?.signatureUrl?.[0]?.path.replace(/\\/g, "/") || null,
+        uploadDocsUrls: files?.uploadDocsUrls? files.uploadDocsUrls.map((f: Express.Multer.File) =>f.path.replace(/\\/g, "/")
+            )
+          : [],
+      };
+
+      // Convert string booleans to actual booleans
+      data.consentPublish =
+        data.consentPublish === "true" || data.consentPublish === true;
+      data.consentRules =
+        data.consentRules === "true" || data.consentRules === true;
+      data.consentContact =
+        data.consentContact === "true" || data.consentContact === true;
+
+      const result = await InterviewApplicationService.create(data);
       res.status(201).json(result);
     } catch (error: any) {
+      console.error("Create error:", error);
       res.status(400).json({ error: error.message });
     }
   }
@@ -41,7 +76,13 @@ export class InterviewApplicationController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = req.body;
+      const data = {
+        ...req.body,
+        portraitUrl: (req.files as any)?.portraitUrl?.[0],
+        signatureUrl: (req.files as any)?.signatureUrl?.[0],
+        uploadDocsUrls: (req.files as any)?.uploadDocsUrls || [],
+      };
+
       const updated = await InterviewApplicationService.update(id, data);
       res.status(200).json(updated);
     } catch (error: any) {
