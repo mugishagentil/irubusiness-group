@@ -196,14 +196,12 @@ const PartnershipApplicationForm = () => {
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto">
               <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-blue-400 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-white font-bold text-xl">IRU</span>
-                </div>
-                <h1 className="text-4xl md:text-6xl font-bold text-white">
+              
+                <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
                   Partnership & Shareholder Application
                 </h1>
               </div>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-gray-600 mb-8">
                 Smart, attractive and super-comprehensive form to apply as partner or shareholder in any IRU project.
               </p>
             </div>

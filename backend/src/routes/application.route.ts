@@ -132,7 +132,7 @@ router.post(
  *       200:
  *         description: List of interview applications
  */
-router.get("/interviews", requireAuth,requireRole('admin'),InterviewApplicationController.getAll);
+router.get("/interviews", requireAuth, requireRole('admin'), InterviewApplicationController.getAll);
 
 /**
  * @openapi
@@ -150,7 +150,7 @@ router.get("/interviews", requireAuth,requireRole('admin'),InterviewApplicationC
  *       200:
  *         description: Interview application retrieved
  */
-router.get("/interviews/:id",requireAuth,requireRole('admin'), InterviewApplicationController.getById);
+router.get("/interviews/:id", requireAuth, requireRole('admin'), InterviewApplicationController.getById);
 
 /**
  * @openapi
@@ -168,7 +168,37 @@ router.get("/interviews/:id",requireAuth,requireRole('admin'), InterviewApplicat
  *       204:
  *         description: Interview application deleted
  */
-router.delete("/interviews/:id", requireAuth,requireRole('admin'),InterviewApplicationController.delete);
+router.delete("/interviews/:id", requireAuth, requireRole('admin'), InterviewApplicationController.delete);
+
+/**
+ * @openapi
+ * /api/applications/interviews/{id}/status:
+ *   patch:
+ *     summary: Update interview application status
+ *     tags: [InterviewApplications]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 example: "approved"
+ *     responses:
+ *       200:
+ *         description: Interview application status updated
+ */
+router.patch("/interviews/:id/status", requireAuth, requireRole('admin'), InterviewApplicationController.updateStatus);
+
+// -------------------- PARTNERSHIP APPLICATION ROUTES --------------------
 
 /**
  * @openapi
@@ -211,12 +241,7 @@ router.delete("/interviews/:id", requireAuth,requireRole('admin'),InterviewAppli
  *               - email
  *               - phone
  */
-router.post(
-  "/partners",
-  upload.array("docs", 5), // accept up to 5 files
-  PartnershipApplicationController.create
-);
-
+router.post("/partners", upload.array("docs", 5), PartnershipApplicationController.create);
 
 /**
  * @openapi
@@ -228,9 +253,25 @@ router.post(
  *       200:
  *         description: List of partnership applications
  */
-router.get("/partners", requireAuth,requireRole('admin'),PartnershipApplicationController.findAll);
+router.get("/partners", requireAuth, requireRole('admin'), PartnershipApplicationController.findAll);
 
-
+/**
+ * @openapi
+ * /api/applications/partners/{id}:
+ *   get:
+ *     summary: Get a single partnership application
+ *     tags: [PartnershipApplications]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Partnership application retrieved
+ */
+router.get("/partners/:id", requireAuth, requireRole('admin'), PartnershipApplicationController.findById);
 
 /**
  * @openapi
@@ -243,11 +284,39 @@ router.get("/partners", requireAuth,requireRole('admin'),PartnershipApplicationC
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       204:
  *         description: Partnership application deleted
  */
-router.delete("/partners/:id",requireAuth,requireRole('admin'), PartnershipApplicationController.delete);
+router.delete("/partners/:id", requireAuth, requireRole('admin'), PartnershipApplicationController.delete);
+
+/**
+ * @openapi
+ * /api/applications/partners/{id}/status:
+ *   patch:
+ *     summary: Update partnership application status
+ *     tags: [PartnershipApplications]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 example: "approved"
+ *     responses:
+ *       200:
+ *         description: Partnership application status updated
+ */
+router.patch("/partners/:id/status", requireAuth, requireRole('admin'), PartnershipApplicationController.updateStatus);
 
 export default router;

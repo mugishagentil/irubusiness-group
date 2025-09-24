@@ -34,14 +34,20 @@ export class PartnershipApplicationController {
     res.json(result);
   }
 
-  static async update(req: Request, res: Response) {
+  static async updateStatus(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = req.body;
-      const result = await PartnershipApplicationService.update(id, data);
-      res.json(result);
+      const { status } = req.body;
+
+      if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+      }
+
+      const updatedApp = await PartnershipApplicationService.updateStatus(id, status);
+      res.status(200).json(updatedApp);
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error("Update status error:", error);
+      res.status(500).json({ error: error.message });
     }
   }
 

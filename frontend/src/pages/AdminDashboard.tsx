@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../contexts/AdminContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -8,80 +9,77 @@ import {
   Users, 
   FileText, 
   MessageSquare, 
-  Settings, 
   TrendingUp,
-  Calendar,
+  Clock,
   AlertCircle,
-  CheckCircle,
-  Clock
+  CheckCircle
 } from 'lucide-react';
+import { ContactAPI } from '@/services/contactmsg';
+import { InterviewApplicationsAPI, PartnershipApplicationsAPI } from '@/services/application';
+
+interface Application {
+  id: string;
+  type: string;
+  name: string;
+  email: string;
+  status: 'pending' | 'approved' | 'rejected';
+  date: string;
+  position: string;
+}
+
+interface Message {
+  id: string;
+  fullName: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'read' | 'unread';
+  createdAt: string;
+}
 
 const AdminDashboard: React.FC = () => {
-  const { admin, logout } = useAdmin();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { admin } = useAdmin();
+  const navigate = useNavigate();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [stats, setStats] = useState({
+    totalApplications: 0,
+    pendingApplications: 0,
+    approvedApplications: 0,
+    rejectedApplications: 0,
+    totalProjects: 0,
+    activeProjects: 0,
+    totalMessages: 0,
+    unreadMessages: 0
+  });
 
-  // Mock data for dashboard
-  const stats = {
-    totalApplications: 24,
-    pendingApplications: 8,
-    approvedApplications: 12,
-    rejectedApplications: 4,
-    totalProjects: 15,
-    activeProjects: 10,
-    totalMessages: 18,
-    unreadMessages: 5
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const partnershipApps: Application[] = await PartnershipApplicationsAPI.getAll();
+        const interviewApps: Application[] = await InterviewApplicationsAPI.getAll();
+        const apps: Application[] = [...partnershipApps, ...interviewApps];
+        const msgs: Message[] = await ContactAPI.getAll();
 
-  const recentApplications = [
-    {
-      id: 1,
-      type: 'Interview',
-      name: 'John Doe',
-      email: 'john@example.com',
-      status: 'pending',
-      date: '2024-01-15',
-      position: 'Content Creator'
-    },
-    {
-      id: 2,
-      type: 'Partnership',
-      name: 'Jane Smith',
-      email: 'jane@company.com',
-      status: 'approved',
-      date: '2024-01-14',
-      position: 'Strategic Partner'
-    },
-    {
-      id: 3,
-      type: 'Interview',
-      name: 'Mike Johnson',
-      email: 'mike@example.com',
-      status: 'rejected',
-      date: '2024-01-13',
-      position: 'Marketing Specialist'
-    }
-  ];
+        setApplications(apps);
+        setMessages(msgs);
 
-  const recentMessages = [
-    {
-      id: 1,
-      name: 'Sarah Wilson',
-      email: 'sarah@example.com',
-      subject: 'Partnership Inquiry',
-      message: 'Interested in becoming a partner...',
-      date: '2024-01-15',
-      read: false
-    },
-    {
-      id: 2,
-      name: 'David Brown',
-      email: 'david@company.com',
-      subject: 'Service Question',
-      message: 'Can you provide more details about...',
-      date: '2024-01-14',
-      read: true
-    }
-  ];
+        setStats({
+          totalApplications: apps.length,
+          pendingApplications: apps.filter(a => a.status === 'pending').length,
+          approvedApplications: apps.filter(a => a.status === 'approved').length,
+          rejectedApplications: apps.filter(a => a.status === 'rejected').length,
+          totalProjects: 0,
+          activeProjects: 0,
+          totalMessages: msgs.length,
+          unreadMessages: msgs.filter(m => m.status === 'unread').length
+        });
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+      }
+    };
+    fetchData();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -115,7 +113,7 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{stats.totalApplications}</div>
-              <p className="text-xs text-gray-500">+12% from last month</p>
+              <p className="text-xs text-gray-500">Applications submitted</p>
             </CardContent>
           </Card>
 
@@ -166,7 +164,7 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentApplications.map((app) => (
+                {applications.slice(0, 5).map((app) => (
                   <div key={app.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
@@ -188,7 +186,7 @@ const AdminDashboard: React.FC = () => {
                 ))}
               </div>
               <div className="mt-4">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => navigate('/admin/applications')}>
                   View All Applications
                 </Button>
               </div>
@@ -206,27 +204,26 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentMessages.map((message) => (
-                  <div key={message.id} className={`p-4 rounded-lg ${message.read ? 'bg-gray-50' : 'bg-blue-50 border border-blue-200'}`}>
+                {messages.slice(0, 3).map((msg) => (
+                  <div key={msg.id} className={`p-4 rounded-lg ${msg.status === 'read' ? 'bg-gray-50' : 'bg-blue-50 border border-blue-200'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-900">{message.name}</h4>
-                      {!message.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                      <h4 className="font-semibold text-gray-900">{msg.fullName}</h4>
+                      {msg.status === 'unread' && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
                     </div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">{message.subject}</p>
-                    <p className="text-sm text-gray-600 line-clamp-2">{message.message}</p>
-                    <p className="text-xs text-gray-500 mt-2">{message.date}</p>
+                    <p className="text-sm font-medium text-gray-700 mb-1">{msg.subject}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">{msg.message}</p>
+                    <p className="text-xs text-gray-500 mt-2">{msg.createdAt}</p>
                   </div>
                 ))}
               </div>
               <div className="mt-4">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => navigate('/admin/messages')}>
                   View All Messages
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
-
       </div>
     </div>
   );

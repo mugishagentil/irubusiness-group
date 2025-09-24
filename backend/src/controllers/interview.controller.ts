@@ -72,21 +72,20 @@ export class InterviewApplicationController {
     }
   }
 
-  // Update
-  static async update(req: Request, res: Response) {
+  static async updateStatus(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = {
-        ...req.body,
-        portraitUrl: (req.files as any)?.portraitUrl?.[0],
-        signatureUrl: (req.files as any)?.signatureUrl?.[0],
-        uploadDocsUrls: (req.files as any)?.uploadDocsUrls || [],
-      };
+      const { status } = req.body;
 
-      const updated = await InterviewApplicationService.update(id, data);
-      res.status(200).json(updated);
+      if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+      }
+
+      const updatedApp = await InterviewApplicationService.updateStatus(id, status);
+      res.status(200).json(updatedApp);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      console.error("Update status error:", error);
+      res.status(500).json({ error: error.message });
     }
   }
 

@@ -26,7 +26,7 @@ export const InterviewApplicationsAPI = {
       }
     });
     
-    // FIXED: Handle files correctly with proper validation
+    // Handle file uploads
     if (data.portraitUrl && data.portraitUrl instanceof File) {
       console.log('Adding portrait file:', data.portraitUrl.name);
       formData.append('portraitUrl', data.portraitUrl);
@@ -67,6 +67,13 @@ export const InterviewApplicationsAPI = {
 
   delete: (id: string) =>
     apiFetch(`/applications/interviews/${id}`, { method: "DELETE" }),
+
+  updateStatus: (id: string, status: string) =>
+    apiFetch(`/applications/interviews/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }),
 };
 
 export const PartnershipApplicationsAPI = {
@@ -74,6 +81,7 @@ export const PartnershipApplicationsAPI = {
     apiFetch("/applications/partners", {
       method: "POST",
       body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
     }),
 
   getAll: () => apiFetch("/applications/partners"),
@@ -82,4 +90,11 @@ export const PartnershipApplicationsAPI = {
 
   delete: (id: string) =>
     apiFetch(`/applications/partners/${id}`, { method: "DELETE" }),
+
+  updateStatus: (id: string, status: string) =>
+    apiFetch(`/applications/partners/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }),
 };

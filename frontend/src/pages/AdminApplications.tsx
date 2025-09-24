@@ -1,150 +1,217 @@
-import React, { useState } from 'react';
-import { useAdmin } from '../contexts/AdminContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import AdminNav from '../components/AdminNav';
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
+import React, { useEffect, useState } from "react";
+import { useAdmin } from "../contexts/AdminContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../components/ui/collapsible";
+import AdminNav from "../components/AdminNav";
+import {
+  Search,
+  Filter,
+  Download,
+  CheckCircle,
+  XCircle,
   Clock,
   FileText,
   Users,
-  Calendar,
   Mail,
   Phone,
-  MapPin
-} from 'lucide-react';
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Building,
+  Globe,
+  DollarSign,
+  BarChart3,
+} from "lucide-react";
+import {
+  InterviewApplicationsAPI,
+  PartnershipApplicationsAPI,
+} from "@/services/application";  
 
 const AdminApplications: React.FC = () => {
   const { admin, logout } = useAdmin();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [expandedAppId, setExpandedAppId] = useState<string | null>(null);
 
-  // Mock data for applications
-  const applications = [
-    {
-      id: 1,
-      type: 'Interview',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1 (555) 123-4567',
-      location: 'New York, NY',
-      position: 'Content Creator',
-      status: 'pending',
-      date: '2024-01-15',
-      experience: '5 years',
-      portfolio: 'https://johndoe.portfolio.com',
-      pitch: 'Passionate about creating engaging content that drives results...',
-      availability: '2024-02-01',
-      channels: ['YouTube', 'Instagram', 'TikTok'],
-      contentTypes: ['Educational', 'Entertainment', 'Lifestyle']
-    },
-    {
-      id: 2,
-      type: 'Partnership',
-      name: 'Jane Smith',
-      email: 'jane@company.com',
-      phone: '+1 (555) 987-6543',
-      location: 'Los Angeles, CA',
-      position: 'Strategic Partner',
-      status: 'approved',
-      date: '2024-01-14',
-      experience: '10 years',
-      company: 'Tech Solutions Inc.',
-      investment: '$50,000',
-      role: 'Technology Integration',
-      timeline: '6 months',
-      returns: '15% annually'
-    },
-    {
-      id: 3,
-      type: 'Interview',
-      name: 'Mike Johnson',
-      email: 'mike@example.com',
-      phone: '+1 (555) 456-7890',
-      location: 'Chicago, IL',
-      position: 'Marketing Specialist',
-      status: 'rejected',
-      date: '2024-01-13',
-      experience: '3 years',
-      pitch: 'Experienced in digital marketing with proven track record...',
-      availability: '2024-01-20',
-      channels: ['Facebook', 'LinkedIn'],
-      contentTypes: ['Educational', 'B2B']
-    },
-    {
-      id: 4,
-      type: 'Partnership',
-      name: 'Sarah Wilson',
-      email: 'sarah@enterprise.com',
-      phone: '+1 (555) 321-0987',
-      location: 'Miami, FL',
-      position: 'Investment Partner',
-      status: 'pending',
-      date: '2024-01-12',
-      experience: '15 years',
-      company: 'Wilson Enterprises',
-      investment: '$100,000',
-      role: 'Strategic Advisory',
-      timeline: '12 months',
-      returns: '20% annually'
-    }
-  ];
+  // Fetch applications
+  useEffect(() => {
+    const fetchApps = async () => {
+      try {
+        setLoading(true);
+        const [interviews, partners] = await Promise.all([
+          InterviewApplicationsAPI.getAll(),
+          PartnershipApplicationsAPI.getAll(),
+        ]);
 
-  const filteredApplications = applications.filter(app => {
-    const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.position.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || app.type.toLowerCase() === filterType;
-    const matchesStatus = filterStatus === 'all' || app.status === filterStatus;
-    
+        // Normalize both types with actual backend fields
+        const normalized = [
+          ...(interviews || []).map((i: any) => ({ 
+            ...i, 
+            type: "Interview",
+            // Only use fields that exist in InterviewApplication model
+            name: i.fullName,
+            email: i.email,
+            phone: i.phone,
+            location: i.city,
+            createdAt: i.createdAt,
+            status: i.status,
+            // Interview-specific fields
+            headline: i.headline,
+            language: i.language,
+            format: i.format,
+            duration: i.duration,
+            travel: i.travel,
+            sensitivity: i.sensitivity
+          })),
+          ...(partners || []).map((p: any) => ({ 
+            ...p, 
+            type: "Partnership",
+            // Only use fields that exist in PartnershipApplication model
+            name: p.appName,
+            email: p.email,
+            phone: p.phone,
+            location: p.country,
+            createdAt: p.createdAt,
+            status: p.status,
+            // Partnership-specific fields
+            partnershipType: p.type,
+            project: p.project,
+            amount: p.amount,
+            equity: p.equity,
+            board: p.board,
+            roleType: p.roleType,
+            presence: p.presence
+          })),
+        ];
+
+        setApplications(normalized);
+      } catch (err) {
+        console.error("Failed to fetch applications", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApps();
+  }, []);
+
+  const filteredApplications = applications.filter((app) => {
+    const matchesSearch =
+      app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.project?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType =
+      filterType === "all" || app.type.toLowerCase() === filterType;
+    const matchesStatus =
+      filterStatus === "all" || app.status === filterStatus;
+
     return matchesSearch && matchesType && matchesStatus;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'approved': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "approved":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Clock className="h-4 w-4" />;
-      case 'approved': return <CheckCircle className="h-4 w-4" />;
-      case 'rejected': return <XCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case "pending":
+        return <Clock className="h-4 w-4" />;
+      case "approved":
+        return <CheckCircle className="h-4 w-4" />;
+      case "rejected":
+        return <XCircle className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
-  const handleStatusChange = (applicationId: number, newStatus: string) => {
-    // In a real app, this would make an API call
-    console.log(`Changing application ${applicationId} status to ${newStatus}`);
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "Interview":
+        return <FileText className="h-5 w-5 text-blue-500" />;
+      case "Partnership":
+        return <Users className="h-5 w-5 text-orange-500" />;
+      default:
+        return <FileText className="h-5 w-5 text-gray-500" />;
+    }
   };
 
-  const handleViewDetails = (applicationId: number) => {
-    // In a real app, this would open a detailed view modal
-    console.log(`Viewing details for application ${applicationId}`);
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const handleStatusChange = async (
+    applicationId: string,
+    type: string,
+    newStatus: string
+  ) => {
+    try {
+      if (type === "Interview") {
+        await InterviewApplicationsAPI.updateStatus(applicationId, newStatus);
+      } else {
+        await PartnershipApplicationsAPI.updateStatus(applicationId, newStatus);
+      }
+
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId ? { ...app, status: newStatus } : app
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update status", err);
+    }
+  };
+
+  const toggleExpand = (appId: string) => {
+    setExpandedAppId(expandedAppId === appId ? null : appId);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Applications Management</h1>
-          <p className="text-sm text-gray-600">Manage interview and partnership applications</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Applications Management
+          </h1>
+          <p className="text-sm text-gray-600">
+            Manage interview and partnership applications
+          </p>
         </div>
 
         {/* Filters and Search */}
@@ -166,7 +233,7 @@ const AdminApplications: React.FC = () => {
                   className="pl-10"
                 />
               </div>
-              
+
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Application Type" />
@@ -199,132 +266,211 @@ const AdminApplications: React.FC = () => {
         </Card>
 
         {/* Applications List */}
-        <div className="space-y-4">
-          {filteredApplications.map((app) => (
-            <Card key={app.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className="flex items-center space-x-2">
-                        {app.type === 'Interview' ? (
-                          <FileText className="h-5 w-5 text-blue-500" />
-                        ) : (
-                          <Users className="h-5 w-5 text-orange-500" />
-                        )}
-                        <h3 className="text-lg font-semibold text-gray-900">{app.name}</h3>
+        {loading ? (
+          <p className="text-center text-gray-500">Loading applications...</p>
+        ) : (
+          <div className="space-y-4">
+            {filteredApplications.map((app) => (
+              <Collapsible
+                key={app.id}
+                open={expandedAppId === app.id}
+                onOpenChange={() => toggleExpand(app.id)}
+                className="bg-white rounded-lg shadow-sm border border-gray-200"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 flex-1">
+                      <div className="flex items-center space-x-3">
+                        {getTypeIcon(app.type)}
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {app.name}
+                          </h3>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <div className="flex items-center space-x-1 text-sm text-gray-600">
+                              <Mail className="h-4 w-4" />
+                              <span>{app.email}</span>
+                            </div>
+                            <div className="flex items-center space-x-1 text-sm text-gray-600">
+                              <Phone className="h-4 w-4" />
+                              <span>{app.phone}</span>
+                            </div>
+                            {app.location && (
+                              <div className="flex items-center space-x-1 text-sm text-gray-600">
+                                <MapPin className="h-4 w-4" />
+                                <span>{app.location}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
                       <Badge className={getStatusColor(app.status)}>
                         <div className="flex items-center space-x-1">
                           {getStatusIcon(app.status)}
                           <span className="capitalize">{app.status}</span>
                         </div>
                       </Badge>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Mail className="h-4 w-4" />
-                        <span>{app.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Phone className="h-4 w-4" />
-                        <span>{app.phone}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <MapPin className="h-4 w-4" />
-                        <span>{app.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        <span>{app.date}</span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">Position:</span> {app.position}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">Experience:</span> {app.experience}
-                      </div>
-                    </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleExpand(app.id)}
+                        className="flex items-center space-x-1"
+                      >
+                        {expandedAppId === app.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                        <span>Details</span>
+                      </Button>
 
-                    {/* Application-specific details */}
-                    {app.type === 'Interview' && (
-                      <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                        <h4 className="font-medium text-blue-900 mb-2">Interview Details</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-800">
-                          <div><span className="font-medium">Availability:</span> {app.availability}</div>
-                          <div><span className="font-medium">Channels:</span> {app.channels?.join(', ')}</div>
-                          <div><span className="font-medium">Content Types:</span> {app.contentTypes?.join(', ')}</div>
-                          <div><span className="font-medium">Portfolio:</span> 
-                            <a href={app.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
-                              View Portfolio
-                            </a>
-                          </div>
+                      {app.status === "pending" && (
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              handleStatusChange(app.id, app.type, "approved")
+                            }
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              handleStatusChange(app.id, app.type, "rejected")
+                            }
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Reject
+                          </Button>
                         </div>
-                        <p className="text-sm text-blue-800 mt-2">
-                          <span className="font-medium">Pitch:</span> {app.pitch}
-                        </p>
-                      </div>
-                    )}
-
-                    {app.type === 'Partnership' && (
-                      <div className="bg-orange-50 p-4 rounded-lg mb-4">
-                        <h4 className="font-medium text-orange-900 mb-2">Partnership Details</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-orange-800">
-                          <div><span className="font-medium">Company:</span> {app.company}</div>
-                          <div><span className="font-medium">Investment:</span> {app.investment}</div>
-                          <div><span className="font-medium">Role:</span> {app.role}</div>
-                          <div><span className="font-medium">Timeline:</span> {app.timeline}</div>
-                          <div><span className="font-medium">Expected Returns:</span> {app.returns}</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col space-y-2 ml-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewDetails(app.id)}
-                      className="flex items-center space-x-2"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span>View Details</span>
-                    </Button>
-                    
-                    {app.status === 'pending' && (
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleStatusChange(app.id, 'approved')}
-                          className="bg-orange-600 hover:bg-orange-700 text-white"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleStatusChange(app.id, 'rejected')}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Reject
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
 
-        {filteredApplications.length === 0 && (
+                <CollapsibleContent className="px-6 pb-6 border-t border-gray-200">
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Application Type Specific Details */}
+                    {app.type === "Interview" ? (
+                      <>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Interview Details</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Headline:</span>
+                              <span className="font-medium">{app.headline || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Language:</span>
+                              <span className="font-medium">{app.language || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Format:</span>
+                              <span className="font-medium">{app.format || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Duration:</span>
+                              <span className="font-medium">{app.duration || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Travel:</span>
+                              <span className="font-medium">{app.travel || "Not specified"}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Additional Info</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Sensitivity:</span>
+                              <span className="font-medium">{app.sensitivity || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Applied:</span>
+                              <span className="font-medium">
+                                {new Date(app.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Partnership Details</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Type:</span>
+                              <span className="font-medium">{app.type || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Project:</span>
+                              <span className="font-medium">{app.project || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Investment:</span>
+                              <span className="font-medium">
+                                {app.amount ? formatCurrency(app.amount) : "Not specified"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Equity:</span>
+                              <span className="font-medium">
+                                {app.equity ? `${app.equity}%` : "Not specified"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Terms & Conditions</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Board Representation:</span>
+                              <span className="font-medium">{app.board || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Role Type:</span>
+                              <span className="font-medium">{app.roleType || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Presence:</span>
+                              <span className="font-medium">{app.presence || "Not specified"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Applied:</span>
+                              <span className="font-medium">
+                                {new Date(app.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        )}
+
+        {!loading && filteredApplications.length === 0 && (
           <Card>
             <CardContent className="text-center py-12">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No applications found</h3>
-              <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No applications found
+              </h3>
+              <p className="text-gray-600">
+                Try adjusting your search or filter criteria.
+              </p>
             </CardContent>
           </Card>
         )}

@@ -13,6 +13,7 @@ import {
   Send
 } from "lucide-react";
 import emailjs from '@emailjs/browser';
+import { ContactAPI } from "@/services/contactmsg";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -27,36 +28,31 @@ const Contact = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const SERVICE_ID = 'service_ubcbbiq';
-  const TEMPLATE_ID = 'template_bvdx7ed';
-  const PUBLIC_KEY = 'fBfvDa4Xm0o_zGhxa';
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setSending(true);
+  setError(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    setError(null);
+  try {
+    await ContactAPI.create({
+      fullName: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      subject: formData.subject,
+      message: formData.message,
+    });
 
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, formData, PUBLIC_KEY)
-      .then(() => {
-        setSuccess(true);
-        setSending(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: ''
-        });
-        setTimeout(() => {
-          setSuccess(false);
-        }, 5000);
-      })
-      .catch((err) => {
-        setError('Failed to send message. Please try again later.');
-        setSending(false);
-        console.error('EmailJS error:', err);
-      });
-  };
+    setSuccess(true);
+    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+
+    setTimeout(() => setSuccess(false), 5000);
+  } catch (err) {
+    setError('Failed to send message. Please try again later.');
+    console.error(err);
+  } finally {
+    setSending(false);
+  }
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({

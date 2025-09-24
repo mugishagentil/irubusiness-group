@@ -1,5 +1,5 @@
 // src/services/contact.service.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ContactMessageStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -28,4 +28,18 @@ export class ContactService {
       where: { id },
     });
   }
+
+   static async updateStatus(id: string, status: ContactMessageStatus) {
+      return prisma.contactMessage.update({
+        where: { id },
+        data: { status },
+      });
+  }
+
+  static async delete(id: string) {
+    return prisma.partnershipApplication.delete({
+      where: { id },
+    });
+  }
+  
 }

@@ -5,8 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function apiFetch(url: string, options: RequestInit = {}): Promise<any> {
-  const token = JSON.parse(localStorage.getItem("adminAuth") || "{}")?.token;
+export async function apiFetch(
+  url: string,
+  options: RequestInit = {}
+): Promise<any> {
+  const savedAuth = JSON.parse(localStorage.getItem("adminAuth") || "{}");
+  const token = savedAuth?.accessToken;
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5020/api";
 
   const isFormData = options.body instanceof FormData;
@@ -16,20 +20,32 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
     ...(options.headers || {}),
   };
 
-  // Only set JSON content type if not FormData
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(`${API_URL}${url}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_URL}${url}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "API Error");
+    // Handle expired token / unauthorized
+    if (response.status === 401) {
+      // Clear auth data and redirect to login
+      localStorage.removeItem("adminAuth");
+      window.location.href = "/admin"; // redirect to login
+      throw new Error("Session expired. Redirecting to login...");
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "API Error");
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error("API Fetch Error:", err);
+    throw err;
   }
-
-  return response.json();
 }

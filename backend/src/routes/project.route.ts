@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ProjectController } from "../controllers/project.controller";
 import { requireAuth } from "../middlewares/auth";
 import { requireRole } from "../middlewares/requireRole";
+import { upload } from "../middlewares/upload";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const router = Router();
  *       201:
  *         description: Project created successfully
  */
-router.post("/", requireAuth, requireRole('admin'), ProjectController.create);
+router.post("/", upload.fields([{ name: "image", maxCount: 1 }]), requireAuth, requireRole('admin'), ProjectController.create);
 
 /**
  * @openapi
@@ -69,7 +70,7 @@ router.get("/:id", requireAuth, requireRole('admin'), ProjectController.findById
  *       200:
  *         description: Project updated successfully
  */
-router.put("/:id", requireAuth, requireRole('admin'), ProjectController.update);
+router.put("/:id",upload.fields([{ name: "image", maxCount: 1 }]), requireAuth, requireRole('admin'), ProjectController.update);
 
 /**
  * @openapi

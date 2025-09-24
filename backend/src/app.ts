@@ -11,6 +11,7 @@ import { errorHandler } from "./middlewares/error";
 import logger from "./utils/logger";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
 
 const app = express();
 
@@ -69,6 +70,9 @@ app.use("/api/auth", rateLimiter, authRoutes);
 app.use("/api/applications", rateLimiter, applicationRoutes);
 app.use("/api/contact", rateLimiter, contactRoute);
 app.use("/api/projects", rateLimiter, projectRoutes);
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 // Error handler
 app.use(errorHandler);
 

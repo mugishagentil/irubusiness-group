@@ -1,5 +1,5 @@
 // src/services/partnershipApplication.service.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ApplicationStatus } from "@prisma/client";
 import { CreatePartnershipApplicationInput } from "../types/other.dto";
 
 const prisma = new PrismaClient();
@@ -24,11 +24,10 @@ export class PartnershipApplicationService {
     });
   }
 
-  // Update a partnership application
-  static async update(id: string, data: Partial<CreatePartnershipApplicationInput>) {
-    return prisma.partnershipApplication.update({
+    static async updateStatus(id: string, status: ApplicationStatus) {
+    return prisma.interviewApplication.update({
       where: { id },
-      data,
+      data: { status },
     });
   }
 

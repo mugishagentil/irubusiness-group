@@ -213,6 +213,7 @@ model ContactMessage {
   phone     String? 
   subject   String
   message   String
+  status    ContactMessageStatus @default(unread)
   createdAt DateTime @default(now())
 }
 
@@ -226,6 +227,9 @@ model Project {
   budget      Float?
   startDate   DateTime?
   endDate     DateTime?
+  image    String?
+  impact     String?  @db.Text
+  location   String?  @db.VarChar(255)
   category    String   @db.VarChar(100)
   progress    Int      @default(0) // Percentage 0-100
   

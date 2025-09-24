@@ -75,3 +75,23 @@ export const mapFormDataToBackend = (formData: any) => {
     signature: formData.signature || "",
   };
 };
+
+// utils/enums.ts
+export const mapStatus = (status: string) => {
+  switch (status) {
+    case 'planning': return 'planning';
+    case 'active': return 'active';
+    case 'completed': return 'completed';
+    case 'on-hold': return 'onHold'; // map UI "on-hold" -> backend "onHold"
+    default: return 'planning';
+  }
+};
+
+export const mapPriority = (priority: string) => {
+  switch (priority) {
+    case 'low': return 'low';
+    case 'medium': return 'medium';
+    case 'high': return 'high';
+    default: return 'medium';
+  }
+};

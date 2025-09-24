@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../contexts/AdminContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -21,11 +21,14 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  MapPin
+  MapPin,
+  Upload,
+  X
 } from 'lucide-react';
+import { ProjectsAPI } from '@/services/project';
 
 interface Project {
-  id: number;
+  id: string;
   title: string;
   description: string;
   status: 'planning' | 'active' | 'completed' | 'on-hold';
@@ -33,15 +36,14 @@ interface Project {
   budget: number;
   startDate: string;
   endDate: string;
-  team: string[];
   progress: number;
   category: string;
   client: string;
-  tags: string[];
   location?: string;
   image?: string;
   impact?: string;
-  completionDate?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const AdminProjects: React.FC = () => {
@@ -51,6 +53,11 @@ const AdminProjects: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const [newProject, setNewProject] = useState<Partial<Project>>({
     title: '',
     description: '',
@@ -59,126 +66,43 @@ const AdminProjects: React.FC = () => {
     budget: 0,
     startDate: '',
     endDate: '',
-    team: [],
     progress: 0,
     category: '',
     client: '',
-    tags: []
+    location: '',
+    impact: ''
   });
 
-  // Mock data for projects - matching the structure from Projects page
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: 1,
-      title: 'Rwanda Healthcare Digitalization',
-      description: 'Comprehensive digital transformation of healthcare services across Rwanda. This project aims to modernize healthcare infrastructure and improve patient care through technology.',
-      status: 'active',
-      priority: 'high',
-      budget: 500000,
-      startDate: '2023-01-15',
-      endDate: '2024-06-30',
-      team: ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown'],
-      progress: 75,
-      category: 'Digital Health',
-      client: 'Ministry of Health Rwanda',
-      tags: ['Healthcare', 'Digital Transformation', 'Rwanda', 'Infrastructure'],
-      location: 'Kigali, Rwanda',
-      image: '/Kigali.png',
-      impact: 'Serving 12M+ citizens across Rwanda'
-    },
-    {
-      id: 2,
-      title: 'IruCare Mobile Platform',
-      description: 'Mobile health platform connecting patients with healthcare providers across multiple countries. Enabling remote consultations and health monitoring.',
-      status: 'active',
-      priority: 'high',
-      budget: 750000,
-      startDate: '2023-03-01',
-      endDate: '2024-12-31',
-      team: ['Alex Chen', 'Maria Garcia', 'Tom Wilson', 'Lisa Anderson'],
-      progress: 60,
-      category: 'Mobile Health',
-      client: 'IruCare Global',
-      tags: ['Mobile', 'Telemedicine', 'Global', 'Patient Care'],
-      location: 'Multiple Countries',
-      image: '/Irucare.png',
-      impact: 'Connecting 50,000+ patients globally'
-    },
-    {
-      id: 3,
-      title: 'IRU Core AI Assistant',
-      description: 'Intelligent AI assistant for healthcare decision support and patient care. Delivering smart, dependable solutions across health, finance, education, and agriculture with accurate answers in both English and Kinyarwanda.',
-      status: 'completed',
-      priority: 'high',
-      budget: 300000,
-      startDate: '2023-01-01',
-      endDate: '2023-12-15',
-      team: ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson'],
-      progress: 100,
-      category: 'AI/ML',
-      client: 'IRU Business Group',
-      tags: ['AI', 'Machine Learning', 'Healthcare', 'Multilingual'],
-      location: 'Global',
-      image: '/Irucore - Intelligent AI Assistant.png',
-      impact: 'Served 10,000+ healthcare professionals',
-      completionDate: '2023-12-15'
-    },
-    {
-      id: 4,
-      title: 'HealthLinker Integration',
-      description: 'Integration platform for healthcare data exchange and interoperability across East Africa. Streamlining data flow between healthcare systems.',
-      status: 'planning',
-      priority: 'medium',
-      budget: 400000,
-      startDate: '2024-02-01',
-      endDate: '2025-08-31',
-      team: ['David Brown', 'Alex Chen', 'Maria Garcia'],
-      progress: 15,
-      category: 'Data Integration',
-      client: 'East African Health Network',
-      tags: ['Data Integration', 'Interoperability', 'East Africa', 'Healthcare'],
-      location: 'East Africa',
-      image: '/Healthlinker.png',
-      impact: 'Expected to serve 5M+ patients'
-    },
-    {
-      id: 5,
-      title: 'Priority Healthcare System',
-      description: 'Patient prioritization system for emergency and critical care in Kenya. Streamlining emergency response and improving patient outcomes through intelligent triage.',
-      status: 'completed',
-      priority: 'high',
-      budget: 200000,
-      startDate: '2023-03-01',
-      endDate: '2023-08-20',
-      team: ['Tom Wilson', 'Lisa Anderson', 'John Doe'],
-      progress: 100,
-      category: 'Emergency Care',
-      client: 'Kenya Health Ministry',
-      tags: ['Emergency Care', 'Triage', 'Kenya', 'Critical Care'],
-      location: 'Kenya',
-      image: '/Priority.jpg',
-      impact: 'Reduced emergency response time by 40%',
-      completionDate: '2023-08-20'
-    },
-    {
-      id: 6,
-      title: 'Telemedicine Expansion',
-      description: 'Expanding telemedicine services across West Africa. Bringing remote healthcare access to underserved communities through innovative technology solutions.',
-      status: 'planning',
-      priority: 'medium',
-      budget: 600000,
-      startDate: '2024-06-01',
-      endDate: '2025-12-31',
-      team: ['Sarah Wilson', 'David Brown', 'Mike Johnson', 'Alex Chen'],
-      progress: 5,
-      category: 'Telemedicine',
-      client: 'West African Health Organization',
-      tags: ['Telemedicine', 'West Africa', 'Remote Care', 'Underserved'],
-      location: 'West Africa',
-      image: '/placeholder.svg',
-      impact: 'Expected to reach 2M+ underserved patients'
+  // Helper function to convert ISO date to yyyy-MM-dd format
+  const formatDateForInput = (isoDateString: string | undefined) => {
+    if (!isoDateString) return '';
+    try {
+      const date = new Date(isoDateString);
+      return date.toISOString().split('T')[0];
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
     }
-  ]);
+  };
+
+  // Fetch projects from API
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await ProjectsAPI.getAll();
+      console.log("Fetched projects:", response); 
+      setProjects(response || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredProjects = projects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -220,78 +144,127 @@ const AdminProjects: React.FC = () => {
     }
   };
 
-  const handleAddProject = () => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    const fileInput = document.getElementById('image') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  const resetForm = () => {
+    setNewProject({
+      title: '',
+      description: '',
+      status: 'planning',
+      priority: 'medium',
+      budget: 0,
+      startDate: '',
+      endDate: '',
+      progress: 0,
+      category: '',
+      client: '',
+      location: '',
+      impact: ''
+    });
+    setImageFile(null);
+    setImagePreview(null);
+    setEditingProject(null);
+  };
+
+  const handleAddProject = async () => {
     if (newProject.title && newProject.description) {
-      const project: Project = {
-        id: Date.now(),
-        title: newProject.title,
-        description: newProject.description,
-        status: newProject.status as Project['status'],
-        priority: newProject.priority as Project['priority'],
-        budget: newProject.budget || 0,
-        startDate: newProject.startDate || '',
-        endDate: newProject.endDate || '',
-        team: newProject.team || [],
-        progress: newProject.progress || 0,
-        category: newProject.category || '',
-        client: newProject.client || '',
-        tags: newProject.tags || []
-      };
-      
-      setProjects([...projects, project]);
-      setNewProject({
-        title: '',
-        description: '',
-        status: 'planning',
-        priority: 'medium',
-        budget: 0,
-        startDate: '',
-        endDate: '',
-        team: [],
-        progress: 0,
-        category: '',
-        client: '',
-        tags: []
-      });
-      setShowAddModal(false);
+      try {
+        // FIXED: Create clean project data structure
+        const projectData = {
+          title: newProject.title,
+          description: newProject.description,
+          status: newProject.status || 'planning',
+          priority: newProject.priority || 'medium',
+          budget: Number(newProject.budget) || 0,
+          startDate: newProject.startDate || '',
+          endDate: newProject.endDate || '',
+          progress: Number(newProject.progress) || 0,
+          category: newProject.category || '',
+          client: newProject.client || '',
+          location: newProject.location || '',
+          impact: newProject.impact || '',
+          image: imageFile
+        };
+
+        console.log('Creating project with data:', projectData);
+        await ProjectsAPI.create(projectData);
+        await fetchProjects();
+        resetForm();
+        setShowAddModal(false);
+      } catch (error) {
+        console.error('Error creating project:', error);
+        alert('Error creating project. Please try again.');
+      }
     }
   };
 
   const handleEditProject = (project: Project) => {
     setEditingProject(project);
-    setNewProject(project);
+    // FIXED: Format dates for input fields
+    setNewProject({
+      ...project,
+      startDate: formatDateForInput(project.startDate),
+      endDate: formatDateForInput(project.endDate)
+    });
+    setImagePreview(project.image || null);
     setShowAddModal(true);
   };
 
-  const handleUpdateProject = () => {
+  const handleUpdateProject = async () => {
     if (editingProject && newProject.title && newProject.description) {
-      setProjects(projects.map(p => 
-        p.id === editingProject.id 
-          ? { ...p, ...newProject } as Project
-          : p
-      ));
-      setEditingProject(null);
-      setNewProject({
-        title: '',
-        description: '',
-        status: 'planning',
-        priority: 'medium',
-        budget: 0,
-        startDate: '',
-        endDate: '',
-        team: [],
-        progress: 0,
-        category: '',
-        client: '',
-        tags: []
-      });
-      setShowAddModal(false);
+      try {
+        // FIXED: Create clean project data structure for update
+        const projectData = {
+          title: newProject.title,
+          description: newProject.description,
+          status: newProject.status || 'planning',
+          priority: newProject.priority || 'medium',
+          budget: Number(newProject.budget) || 0,
+          startDate: newProject.startDate || '',
+          endDate: newProject.endDate || '',
+          progress: Number(newProject.progress) || 0,
+          category: newProject.category || '',
+          client: newProject.client || '',
+          location: newProject.location || '',
+          impact: newProject.impact || '',
+          image: imageFile
+        };
+
+        console.log('Updating project with data:', projectData);
+        await ProjectsAPI.update(editingProject.id, projectData);
+        await fetchProjects();
+        resetForm();
+        setShowAddModal(false);
+      } catch (error) {
+        console.error('Error updating project:', error);
+        alert('Error updating project. Please try again.');
+      }
     }
   };
 
-  const handleDeleteProject = (projectId: number) => {
+  const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
-      setProjects(projects.filter(p => p.id !== projectId));
+      try {
+        await ProjectsAPI.delete(projectId);
+        await fetchProjects();
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        alert('Error deleting project. Please try again.');
+      }
     }
   };
 
@@ -301,6 +274,32 @@ const AdminProjects: React.FC = () => {
       currency: 'USD'
     }).format(amount);
   };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Not set';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AdminNav />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-lg text-gray-600">Loading projects...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -320,6 +319,7 @@ const AdminProjects: React.FC = () => {
             Add Project
           </Button>
         </div>
+
         {/* Filters and Search */}
         <Card className="mb-6">
           <CardHeader>
@@ -377,7 +377,6 @@ const AdminProjects: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-              {/* Project Image */}
               {project.image && (
                 <div className="w-full h-48 overflow-hidden">
                   <img
@@ -431,12 +430,12 @@ const AdminProjects: React.FC = () => {
                   <div>
                     <div className="flex justify-between text-sm text-gray-600 mb-1">
                       <span>Progress</span>
-                      <span>{project.progress}%</span>
+                      <span>{project.progress || 0}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${project.progress}%` }}
+                        style={{ width: `${project.progress || 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -455,15 +454,13 @@ const AdminProjects: React.FC = () => {
                     <div>
                       <span className="font-medium">Category:</span> {project.category}
                     </div>
-                    {project.completionDate && (
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Completed: {project.completionDate}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>Created: {formatDate(project.createdAt)}</span>
+                    </div>
                   </div>
 
-                  {/* Impact Section for Completed Projects */}
+                  {/* Impact Section */}
                   {project.impact && (
                     <div className="p-3 bg-orange-50 rounded-lg">
                       <p className="text-sm font-medium text-orange-800">Impact:</p>
@@ -471,13 +468,10 @@ const AdminProjects: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1">
-                    {project.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
+                  {/* Budget */}
+                  <div className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                    <DollarSign className="h-4 w-4" />
+                    <span>{formatCurrency(project.budget || 0)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -509,7 +503,7 @@ const AdminProjects: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="title">Project Title</Label>
+                    <Label htmlFor="title">Project Title *</Label>
                     <Input
                       id="title"
                       value={newProject.title || ''}
@@ -518,7 +512,7 @@ const AdminProjects: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="client">Client</Label>
+                    <Label htmlFor="client">Client *</Label>
                     <Input
                       id="client"
                       value={newProject.client || ''}
@@ -529,7 +523,7 @@ const AdminProjects: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
                     value={newProject.description || ''}
@@ -537,6 +531,47 @@ const AdminProjects: React.FC = () => {
                     placeholder="Enter project description"
                     rows={3}
                   />
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <Label htmlFor="image">Project Image</Label>
+                  <div className="mt-1 flex items-center space-x-4">
+                    <div className="relative">
+                      <Input
+                        id="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <Label
+                        htmlFor="image"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Choose Image
+                      </Label>
+                    </div>
+                    {imagePreview && (
+                      <div className="relative">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="h-16 w-16 object-cover rounded"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeImage}
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -574,7 +609,7 @@ const AdminProjects: React.FC = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="budget">Budget</Label>
+                    <Label htmlFor="budget">Budget ($)</Label>
                     <Input
                       id="budget"
                       type="number"
@@ -629,6 +664,27 @@ const AdminProjects: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      value={newProject.location || ''}
+                      onChange={(e) => setNewProject({...newProject, location: e.target.value})}
+                      placeholder="Enter location"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="impact">Impact Description</Label>
+                    <Input
+                      id="impact"
+                      value={newProject.impact || ''}
+                      onChange={(e) => setNewProject({...newProject, impact: e.target.value})}
+                      placeholder="Describe project impact"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-end space-x-2 mt-6">
@@ -636,21 +692,7 @@ const AdminProjects: React.FC = () => {
                   variant="outline" 
                   onClick={() => {
                     setShowAddModal(false);
-                    setEditingProject(null);
-                    setNewProject({
-                      title: '',
-                      description: '',
-                      status: 'planning',
-                      priority: 'medium',
-                      budget: 0,
-                      startDate: '',
-                      endDate: '',
-                      team: [],
-                      progress: 0,
-                      category: '',
-                      client: '',
-                      tags: []
-                    });
+                    resetForm();
                   }}
                 >
                   Cancel
@@ -658,6 +700,7 @@ const AdminProjects: React.FC = () => {
                 <Button 
                   onClick={editingProject ? handleUpdateProject : handleAddProject}
                   className="bg-orange-600 hover:bg-orange-700"
+                  disabled={!newProject.title || !newProject.description || !newProject.client}
                 >
                   {editingProject ? 'Update Project' : 'Add Project'}
                 </Button>

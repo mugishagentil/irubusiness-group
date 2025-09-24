@@ -1,5 +1,5 @@
 // src/services/interviewApplication.service.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ApplicationStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -35,23 +35,12 @@ export class InterviewApplicationService {
     });
   }
 
-  // Update an existing interview application
-  static async update(id: string, data: any) {
-    const prismaData = {
-      ...data,
-      portraitPath: data.portraitUrl ? data.portraitUrl.path : undefined,
-      signaturePath: data.signatureUrl ? data.signatureUrl.path : undefined,
-      uploadDocsPaths: data.uploadDocsUrls
-        ? data.uploadDocsUrls.map((f: Express.Multer.File) => f.path)
-        : undefined,
-      availability: data.availability ? new Date(data.availability) : undefined,
-    };
-
-    return prisma.interviewApplication.update({
-      where: { id },
-      data: prismaData,
-    });
-  }
+   static async updateStatus(id: string, status: ApplicationStatus) {
+      return prisma.interviewApplication.update({
+        where: { id },
+        data: { status },
+      });
+    }
 
   // Delete an interview application
   static async delete(id: string) {

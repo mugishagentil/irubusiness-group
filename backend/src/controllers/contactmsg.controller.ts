@@ -42,4 +42,27 @@ export class ContactController {
       });
     }
   }
+
+  static async updateStatus(req: Request, res: Response) {
+      try {
+        const { id } = req.params;
+        const { status } = req.body;
+  
+        if (!status) {
+          return res.status(400).json({ error: "Status is required" });
+        }
+  
+        const updatedApp = await ContactService.updateStatus(id, status);
+        res.status(200).json(updatedApp);
+      } catch (error: any) {
+        console.error("Update status error:", error);
+        res.status(500).json({ error: error.message });
+      }
+    }
+  
+    static async delete(req: Request, res: Response) {
+      const { id } = req.params;
+      await ContactService.delete(id);
+      res.status(204).send();
+    }
 }
