@@ -1,6 +1,6 @@
 // src/routes/contact.routes.ts
 import { Router } from "express";
-import { ContactController } from "../controllers/contactmsg.controller";
+import { ContactController } from "../controllers/contacirug.controller";
 import { requireAuth } from "../middlewares/auth";
 import { requireRole } from "../middlewares/requireRole";
 

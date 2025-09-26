@@ -14,7 +14,7 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { ContactAPI } from '@/services/contactmsg';
+import { ContactAPI } from '@/services/contacirug';
 import { InterviewApplicationsAPI, PartnershipApplicationsAPI } from '@/services/application';
 
 interface Application {

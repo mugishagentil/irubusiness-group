@@ -13,7 +13,7 @@ import {
   Send
 } from "lucide-react";
 import emailjs from '@emailjs/browser';
-import { ContactAPI } from "@/services/contactmsg";
+import { ContactAPI } from "@/services/contacirug";
 
 const Contact = () => {
   const [formData, setFormData] = useState({

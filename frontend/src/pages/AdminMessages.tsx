@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import AdminNav from '../components/AdminNav';
 import { Search, Trash2, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import { ContactAPI } from '@/services/contactmsg';
+import { ContactAPI } from '@/services/contacirug';
 
 interface ContactMessage {
   id: string;
